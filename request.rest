@@ -1,0 +1,237 @@
+
+
+POST http://localhost:8081/api-v1/product-category/add
+Content-Type: application/json
+
+{
+    "category_name":"Games"
+}
+
+###
+
+POST http://localhost:8081/api-v1/product-category/add
+Content-Type: application/json
+
+{
+    "category_name":"Songs"
+}
+
+###
+
+
+POST http://localhost:8081/api-v1/product-category/add
+Content-Type: application/json
+
+{
+    "category_name":"Movies"
+}
+
+###
+
+POST http://localhost:8081/api-v1/status/add
+Content-Type: application/json
+
+{
+    "status_name" : "Success"
+}
+###
+
+POST http://localhost:8081/api-v1/status/add
+Content-Type: application/json
+
+{
+    "status_name" : "Waiting for Payment"
+}
+
+
+###
+
+POST http://localhost:8081/api-v1/status/add
+Content-Type: application/json
+
+{
+    "status_name" : "Active"
+}
+
+###
+
+POST http://localhost:8081/api-v1/unit/add
+Content-Type: application/json
+
+{
+    "unit_name" : "coins"
+}
+
+###
+
+GET http://localhost:8081/api-v1/status/all
+Content-Type: application/json
+
+{
+    "status_name" : "Waiting for Payment"
+}
+
+###
+POST http://localhost:4000/api-v1/auth/login
+Content-Type: application/json
+
+{
+    "email":"calvinsidik@gmail234.com",
+    "password":"abcdef"
+}
+
+###
+POST http://localhost:8081/api-v1/product/add
+Content-Type: application/json
+
+{
+    "product_name":"Mobile Legend Bang Bang Bang",
+    "product_description":"MOBA GAMES By Moon Toon",
+    "category_name":"Games",
+    "brand":"moon toon",
+    "product_thumbnail":"https://www.stanleyulili.com/node/node-modules-import-and-use-functions-from-another-file",
+    "status_name":"success",
+    "published":"true"
+}
+
+###
+POST http://localhost:8081/api-v1/product/add
+Content-Type: application/json
+
+{
+    "product_name":"Mobile Legend Bang",
+    "product_description":"MOBA GAMES By Moon Toon",
+    "category_name":"Games",
+    "brand":"moon toon",
+    "product_thumbnail":"https://www.stanleyulili.com/node/node-modules-import-and-use-functions-from-another-file",
+    "status_name":"success",
+    "published":"true"
+}
+
+###
+GET http://localhost:8081/api-v1/product/all
+
+###
+
+POST http://localhost:8081/api-v1/currency/add
+Content-Type: application/json
+
+{
+    "currency_name" : "Rupiah",
+    "currency_symbol" : "Rp",
+    "country" : "Indonesia"
+}
+###
+
+GET http://localhost:8081/api-v1/currency/all
+Content-Type: application/json
+
+
+###
+POST http://localhost:8081/api-v1/product-variaty/add
+Content-Type: application/json
+
+{
+    "product_name" : "Mobile Legend Bang Bang Bang",
+    "variaty_name" : "150 Gold Coins",
+    "price" : 1500,
+    "unit_name" : "coins",
+    "currency_name" : "Rupiah",
+    "url" : "www.google.com",
+    "status_name" : "active"
+}
+
+###
+
+GET http://localhost:8081/api-v1/product-variaty/variaty-name/1/100 Gold Coins
+Content-Type: application/json
+
+###
+POST http://localhost:8081/api-v1/merchant/register
+Content-Type: application/json
+
+{
+    "merchant_name" : "Toko Bintang Baru",
+    "merchant_tax_number" : "1230-1333-33001-000.1",
+    "merchant_address" : "Jalan Jeruk Purut",
+    "status_name" : "Active"
+}
+
+###
+GET http://localhost:8081/api-v1/merchant/all
+Content-Type:  application/json
+
+
+###
+
+POST http://localhost:8081/api-v1/transaction/create
+Content-Type: application/json
+
+{
+   "user_id":1,
+   "total_amount":2500,
+   "status_name":"Waiting for Payment",
+   "product":
+   [{
+    "product_variaty_id":"1",
+    "qty":1
+   },
+   {
+    "product_variaty_id":"2",
+    "qty":1
+   }],
+   "currency_name":"Rupiah"
+}
+
+###
+
+GET http://localhost:8081/api-v1/transaction/
+
+
+###
+POST http://localhost:8081/api-v1/invoice/create
+Content-Type: application/json
+
+{
+    "trx_id" : 2,
+    "currency_name":"Rupiah"
+}
+
+###
+ 
+ POST http://localhost:8081/api-v1/payment/request
+ Content-Type: application/json
+
+{
+    "TxnAmount" : "10000.00"
+}
+
+#  {
+#       "partnerReferenceNo": "20201029000001",
+#       "amount": {
+#         "value": "100000.00",
+#         "currency": "IDR"
+#       },
+#       "merchantId": "123456789",
+#       "subMerchantId": "234891823",
+#       "storeId": null,
+#       "terminalId": "21314125",
+#       "validityPeriod": "2024-05-119T22:25:100+07:00",
+#       "additionalInfo": {
+#         "convenienceFee": "0.00",
+#         "partnerMerchantType": "SA",
+#         "terminalLocationName": "Bakso Malang"
+#       }
+#     }
+
+###
+
+ POST http://localhost:8081/api-v1/payment-type/create
+ Content-Type: application/json
+
+ {
+    "TxnAmount":"10000.00"
+ }
+
+
+
