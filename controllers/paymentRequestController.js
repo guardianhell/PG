@@ -106,7 +106,8 @@ async function b2bBRI() {
 }
 
 async function generateQRISE2Pay(dataBody) {
-  const url = "https://pg-uat.e2pay.co.id/RMS/API/Direct/1.4.0/index.php";
+  const url =
+    "https://pg-uat.e2pay.co.id/RMS/API/nms2us/direct_api_bridge.php ";
   const merchantKey = process.env.MERCHANTKEY;
   const merchantCode = process.env.MERCHANTCODE;
   const signature = crypto
@@ -122,13 +123,17 @@ async function generateQRISE2Pay(dataBody) {
 
   console.log(signature);
   const data = {
-    MerchantID: "EP001658_S005",
+    MerchantCode: process.env.MERCHANTCODE,
+    PaymentId: 21,
     ReferenceNo: dataBody.ReferenceNo,
-    TxnCurrency: "IDR",
+    Currency: "IDR",
     TxnAmount: dataBody.TxnAmount,
-    TxnType: "SALS",
-    TxnChannel: "E2PAY_LINKAJA_QRIS",
+    ProdDesc: "Vou Game",
+    UserName: "persontest",
+    UserEmail: "person@cyberber.id",
+    UserContact: "82131",
     Signature: signature,
+    CallBackURL: "",
   };
 
   // const response = await axios.post(url, qs.stringify(data), {});
