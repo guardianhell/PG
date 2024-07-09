@@ -122,6 +122,7 @@ async function generateQRISE2Pay(dataBody) {
     .digest("base64");
 
   console.log(signature);
+  console.log(process.env.MERCHANTKEY);
   const data = {
     MerchantCode: process.env.MERCHANTCODE,
     PaymentId: 21,
@@ -133,7 +134,7 @@ async function generateQRISE2Pay(dataBody) {
     UserEmail: "person@cyberber.id",
     UserContact: "82131",
     Signature: signature,
-    CallBackURL: "",
+    CallBackURL: "https://ascasystem.com/hiturl",
   };
 
   // const response = await axios.post(url, qs.stringify(data), {});
@@ -144,5 +145,5 @@ async function generateQRISE2Pay(dataBody) {
     body: JSON.stringify(data),
   });
 
-  console.log(response);
+  console.log(response.data);
 }
