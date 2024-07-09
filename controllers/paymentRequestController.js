@@ -107,13 +107,18 @@ async function b2bBRI() {
 
 async function generateQRISE2Pay(dataBody) {
   const url = "https://pg-uat.e2pay.co.id/RMS/API/Direct/1.4.0/index.php";
+  const merchantKey = process.env.MERCHANTKEY;
+  const merchantCode = process.env.MERCHANTCODE;
   const signature = crypto
-    .createHash("md5")
+    .createHash("sha1")
     .update(
-      dataBody.TxnAmount +
-        ".EP001658_S005.TRX-TEST.cd61b35d5c497c01758be7c91e2d0b94"
+      merchantKey +
+        merchantCode +
+        dataBody.ReferenceNo +
+        dataBody.TxnAmount +
+        "IDR"
     )
-    .digest("hex");
+    .digest("base64");
 
   console.log(signature);
   const data = {
