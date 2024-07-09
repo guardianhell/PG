@@ -106,7 +106,7 @@ async function b2bBRI() {
 }
 
 async function generateQRISE2Pay(dataBody) {
-  const url = "paytest.e2pay.co.id/merchant-switching/services/directPayment";
+  const url = "https://pg-uat.e2pay.co.id/RMS/API/nms2us/direct_api_bridge.php";
   const merchantKey = process.env.MERCHANTKEY;
   const merchantCode = process.env.MERCHANTCODE;
   const signature = crypto
