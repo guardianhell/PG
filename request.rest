@@ -203,6 +203,7 @@ Content-Type: application/json
  Content-Type: application/json
 
 {
+    "ReferenceNo" : "TRX-TEST-001",
     "TxnAmount" : "10000.00"
 }
 
