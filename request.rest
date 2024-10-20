@@ -204,7 +204,7 @@ Content-Type: application/json
 
 {
     "ReferenceNo" : "TRX-TEST-001",
-    "TxnAmount" : "10000.00"
+    "TxnAmount" : "10000"
 }
 
 #  {
@@ -227,12 +227,30 @@ Content-Type: application/json
 
 ###
 
+ POST http://localhost:8081/api-v1/product/token
+ Content-Type: application/json
+###
+
+
+ POST http://localhost:8081/api-v1/product/voucher
+ Content-Type: application/json
+###
+
+ POST http://localhost:8081/api-v1/product/games
+ Content-Type: application/json
+###
+
+
  POST http://localhost:8081/api-v1/payment-type/create
  Content-Type: application/json
 
  {
     "TxnAmount":"10000.00"
  }
+ ###
 
+
+
+###
 
 

@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const { func } = require("joi");
-
+const cors = require('cors')
 let urlAPI = "/api-v1";
 
 //add Route
@@ -26,6 +26,7 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(cors())
 
 app.use(urlAPI + "/unit", unitRoute);
 app.use(urlAPI + "/product-category", productCategoryRoute);

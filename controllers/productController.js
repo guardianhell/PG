@@ -1,7 +1,10 @@
 const moment = require("moment");
 const db = require("../util/dbconnections");
+
 const router = require("express").Router();
 const verify = require("../verify");
+const crypto = require("crypto");
+const qs = require("querystring");
 const { func } = require("joi");
 const validation = require("../validations");
 const productCategoryController = require("../controllers/productCategoryController");
@@ -11,6 +14,9 @@ const getProductCategoryByName =
 const getStatusByName =
   require("../controllers/statusController").getStatusByName;
 const general = require("../general");
+const { default: axios } = require("axios");
+const json = require("body-parser/lib/types/json");
+const { log } = require("console");
 
 exports.addNewProduct = async function (req, res) {
   try {
@@ -153,6 +159,46 @@ exports.searchAllPublishedProduct = async function (req, res) {
   }
 };
 
+exports.getTokenUniPlay = async function (req, res) {
+  try {
+
+    const response = await generateUniplayToken()
+
+    if (response.data.status == 200) {
+      return res.send(response.access_token)
+    }
+
+
+  }
+  catch (error) {
+    return res.status(500).send(error.message)
+
+  }
+}
+
+exports.getVoucherUniplay = async function (req, res) {
+  try {
+    const response = await getVoucherUniplay()
+    return res.send(response)
+    console.log(response);
+
+
+
+  }
+  catch (error) {
+    return res.status(500).send(error.message)
+  }
+}
+
+exports.getDTUUniplay = async function (req, res) {
+  try {
+    const response = await getDTUUniplay()
+    return res.send(response)
+  } catch (error) {
+    return res.status(500).send(error.message)
+  }
+}
+
 // FUNCTION
 
 async function getProductByName(name) {
@@ -193,5 +239,120 @@ async function getAllPublishedProduct() {
 
   return result.rows;
 }
+
+async function generateUPLSignature(date) {
+
+  const jsonArray = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date
+  }
+
+  const jsonString = JSON.stringify(jsonArray)
+
+  const hmackey = process.env.UNIPLAYKEY + "|" + jsonString;
+  console.log(hmackey);
+
+  const uplSignature = await crypto.createHmac('sha512', hmackey).update(jsonString).digest("hex")
+
+  return uplSignature
+}
+
+async function generateTimestamp() {
+  const dateFormat = "YYYY-MM-DD HH:mm:ss"
+  const datedata = moment().format(dateFormat)
+  console.log(datedata);
+
+  return datedata
+}
+
+async function generateUniplayToken() {
+  const datedata = await generateTimestamp()
+  const signature = await generateUPLSignature(datedata)
+
+
+  const data = JSON.stringify({
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: datedata
+  })
+
+  const url = "https://api-reseller.uniplay.id/v1/access-token"
+
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      'Content-Type': "application/json"
+    }
+  }
+  )
+
+  console.log(response.data);
+
+
+
+  return response
+}
+
+
+async function getVoucherUniplay() {
+
+  const responseToken = await generateUniplayToken()
+  const url = "https://api-reseller.uniplay.id/v1/inquiry-voucher"
+  const date = await generateTimestamp()
+  const signature = await generateUPLSignature(date)
+
+
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date
+  }
+
+
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": responseToken.data.access_token
+    }
+  })
+
+
+  return response.data
+
+}
+
+
+async function getDTUUniplay() {
+
+  const responseToken = await generateUniplayToken()
+  const url = "https://api-reseller.uniplay.id/v1/inquiry-dtu"
+  const date = await generateTimestamp()
+  const signature = await generateUPLSignature(date)
+
+
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date
+  }
+
+
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": responseToken.data.access_token
+    }
+  })
+
+
+  console.log(response.data.list_dtu.splice(0, 10));
+
+  return response.data.list_dtu.splice(0, 10)
+
+}
+
+
 
 module.exports.getProductByName = getProductByName;
