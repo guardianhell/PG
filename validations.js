@@ -73,6 +73,7 @@ exports.searchProductVariatyByProductName = function (data) {
 exports.addProductValidation = function (data) {
   const schema = Joi.object({
     product_name: Joi.string().min(1).max(256).required(),
+    product_number: Joi.string().min(6).max(256).required(),
     product_description: Joi.string().min(1).max(2048).required(),
     category_name: Joi.string().min(1).max(128).required(),
     brand: Joi.string().min(1).max(265).required(),

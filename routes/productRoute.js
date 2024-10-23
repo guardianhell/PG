@@ -9,5 +9,6 @@ router.get("/all", productController.searchAllProduct);
 router.post("/token", productController.getTokenUniPlay)
 router.post("/voucher/", productController.getVoucherUniplay)
 router.post("/games/", productController.getDTUUniplay)
+router.post("/sync/uniplay/voucher", productController.syncProductVoucherUniplay)
 
 module.exports = router

@@ -10,96 +10,18 @@ const statusController = require("../controllers/statusController");
 const currencyController = require("../controllers/currencyController");
 const general = require("../general");
 
+
+
 exports.addProductVariaty = async function (req, res) {
   try {
-    const valid = await validation.addProductVariatyValidation(req.body);
+    const response = addProductVariaty(req.body)
 
-    if (valid.error) {
-      return res.status(417).send(valid.error);
+    if (!response.status(200)) {
+      return res.status(response.status).send(response.message)
     }
 
-    const productId = await productController.getProductByName(
-      req.body.product_name
-    );
+    return res.status(200).send(response.data)
 
-    if (productId.length == 0) {
-      return res.status(417).send("Invalid Product Name");
-    }
-
-    var exist = await getProductVariatyByName(
-      productId[0].id,
-      req.body.variaty_name
-    );
-
-    if (exist.length != 0) {
-      return res.status(417).send("Variaty Name has been used in this Product");
-    }
-
-    const statusId = await statusController.getStatusByName(
-      req.body.status_name
-    );
-
-    if (statusId.length == 0) {
-      return res.status(417).send("Invalid Status");
-    }
-
-    const unitId = await unitController.getUnitByName(req.body.unit_name);
-
-    if (unitId.length == 0) {
-      return res.status(417).send("Invalid Unit");
-    }
-
-    const currencyId = await currencyController.getCurrencyByName(
-      req.body.currency_name
-    );
-
-    if (currencyId.length == 0) {
-      return res.status(417).send("Invalid Currency");
-    }
-
-    const productVariatyRows = await getAllProductVariaty();
-
-    const uniqueNumber = await general.numberGenerator(
-      9,
-      productVariatyRows.length + 1
-    );
-
-    const productVariatyNumber = "VAR-" + productId[0].id + "-" + uniqueNumber;
-
-    exist = await getProductVariatyByVariatyNumber(productVariatyNumber);
-
-    if (exist.length != 0) {
-      return res.status(417).send("Variaty Number has been used");
-    }
-
-    let created_at = moment().valueOf();
-    let updated_at = moment().valueOf();
-
-    await db.pool.query(
-      {
-        text: "INSERT INTO product_variaty(product_id, variaty_name, variaty_number, price, unit_id, currency_id, url, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
-        values: [
-          productId[0].id,
-          req.body.variaty_name,
-          productVariatyNumber,
-          req.body.price,
-          unitId[0].id,
-          currencyId[0].id,
-          req.body.url,
-          statusId[0].id,
-          false,
-          created_at,
-          updated_at,
-        ],
-      },
-      (error, result) => {
-        if (error) {
-          console.log(error);
-          return res.status(417).send(error);
-        }
-        return res.status(200).send(result.rows);
-      }
-    );
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message);
@@ -158,8 +80,128 @@ exports.getAllProductVariatyByProductId = async function (req, res) {
   }
 };
 
-exports.updateProductVariaty = async function (req, res) {};
+exports.updateProductVariaty = async function (req, res) { };
 //FUNCTION
+
+async function addProductVariaty(data) {
+  const valid = await validation.addProductVariatyValidation(data);
+
+  if (valid.error) {
+    return res.status(417).send(valid.error);
+  }
+
+  const productId = await productController.getProductByName(
+    data.product_name
+  );
+
+  if (productId.length == 0) {
+    const error = {
+      status: 417,
+      message: "Invalid Product Name"
+    }
+    return error
+  }
+
+  var exist = await getProductVariatyByName(
+    productId[0].id,
+    data.variaty_name
+  );
+
+  if (exist.length != 0) {
+    const error = {
+      status: 417,
+      message: "Variaty Name has been used in this Product"
+    }
+    return error
+  }
+
+  const statusId = await statusController.getStatusByName(
+    data.status_name
+  );
+
+  if (statusId.length == 0) {
+    const error = {
+      status: 417,
+      message: "Invalid Status"
+    }
+    return error;
+  }
+
+  const unitId = await unitController.getUnitByName(req.body.unit_name);
+
+  if (unitId.length == 0) {
+    const error = {
+      status: 417,
+      message: "Invalid Unit"
+    }
+    return error
+  }
+
+  const currencyId = await currencyController.getCurrencyByName(
+    data.currency_name
+  );
+
+  if (currencyId.length == 0) {
+    const error = {
+      status: 417,
+      message: "Invalid Currency"
+    }
+    return error;
+  }
+
+
+
+
+
+  exist = await getProductVariatyByVariatyNumber(data.productVariatyNumber);
+
+  if (exist.length != 0) {
+    const error = {
+      status: 417,
+      message: "Variaty Number has been used"
+    }
+
+    return error
+  }
+
+  let created_at = moment().valueOf();
+  let updated_at = moment().valueOf();
+
+  await db.pool.query(
+    {
+      text: "INSERT INTO product_variaty(product_id, variaty_name, variaty_number, price, unit_id, currency_id, url, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
+      values: [
+        productId[0].id,
+        data.variaty_name,
+        data.productVariatyNumber,
+        data.price,
+        unitId[0].id,
+        currencyId[0].id,
+        data.url,
+        statusId[0].id,
+        false,
+        created_at,
+        updated_at,
+      ],
+    },
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        const error = {
+          status: 417,
+          message: error.message
+        }
+        return error
+      }
+      const data = {
+        status: 200,
+        message: "success",
+        result: result
+      }
+      return data
+    }
+  );
+}
 
 async function getProductVariatyById(id) {
   const result = await db.pool.query({
@@ -201,6 +243,20 @@ async function getAllProductVariaty() {
     text: "SELECT * FROM product_variaty",
   });
   return result.rows;
+}
+
+async function generateVariatyNumber() {
+
+  const productVariatyRows = await getAllProductVariaty();
+
+  const uniqueNumber = await general.numberGenerator(
+    9,
+    productVariatyRows.length + 1
+  );
+
+  const productVariatyNumber = "VAR-" + productId[0].id + "-" + uniqueNumber;
+
+  return productVariatyNumber
 }
 
 module.exports.getProductVariatyByName = getProductVariatyByName;

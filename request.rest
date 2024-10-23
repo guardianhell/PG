@@ -99,8 +99,9 @@ POST http://localhost:8081/api-v1/product/add
 Content-Type: application/json
 
 {
-    "product_name":"Mobile Legend Bang",
+    "product_name":"Mobile Legend Bang Bang Bang Bang26",
     "product_description":"MOBA GAMES By Moon Toon",
+    "product_number":"PRD-31-132-00026",
     "category_name":"Games",
     "brand":"moon toon",
     "product_thumbnail":"https://www.stanleyulili.com/node/node-modules-import-and-use-functions-from-another-file",
@@ -237,6 +238,11 @@ Content-Type: application/json
 ###
 
  POST http://localhost:8081/api-v1/product/games
+ Content-Type: application/json
+###
+
+
+ POST http://localhost:8081/api-v1/product/sync/uniplay/voucher
  Content-Type: application/json
 ###
 
