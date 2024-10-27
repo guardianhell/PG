@@ -292,8 +292,11 @@ async function addNewProduct(data) {
   let created_at = moment().valueOf();
   let updated_at = moment().valueOf();
 
+  const client = await db.pool.connect()
 
-  const response = await db.pool.query(
+  await client.query('BEGIN')
+
+  const response = await client.query(
     {
       text: "INSERT INTO product(product_number, product_name , product_description, product_category_id, brand, product_thumbnail, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
       values: [
@@ -312,6 +315,7 @@ async function addNewProduct(data) {
   ).then((result) => {
     var data = {}
     if (!result.error) {
+      client.query('COMMIT')
       data = {
         status: 200,
         message: "success",
@@ -319,12 +323,13 @@ async function addNewProduct(data) {
       }
 
     } else {
+      client.query('ROLLBACK')
       data = {
         status: 417,
         message: result.error
       }
     }
-
+    client.release()
     return data
   })
 
