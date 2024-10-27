@@ -43,6 +43,7 @@ exports.searchProductCategoryNameValidation = function (data) {
 exports.addProductVariatyValidation = function (data) {
   const schema = Joi.object({
     product_name: Joi.string().min(1).max(256).required(),
+    product_variaty_number: Joi.string().min(1).max(256).required(),
     variaty_name: Joi.string().min(1).max(256).required(),
     price: Joi.number().positive().required(),
     unit_name: Joi.string().min(1).max(128).required(),

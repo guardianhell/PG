@@ -4,7 +4,7 @@ POST http://localhost:8081/api-v1/product-category/add
 Content-Type: application/json
 
 {
-    "category_name":"Games"
+    "category_name":"voucher"
 }
 
 ###
@@ -59,7 +59,7 @@ POST http://localhost:8081/api-v1/unit/add
 Content-Type: application/json
 
 {
-    "unit_name" : "coins"
+    "unit_name" : "voucher"
 }
 
 ###
@@ -133,7 +133,8 @@ POST http://localhost:8081/api-v1/product-variaty/add
 Content-Type: application/json
 
 {
-    "product_name" : "Mobile Legend Bang Bang Bang",
+    "product_name" : "Mobile Legend Bang Bang Bang Bang25",
+    "product_variaty_number":"VAR-3123",
     "variaty_name" : "150 Gold Coins",
     "price" : 1500,
     "unit_name" : "coins",
@@ -239,6 +240,22 @@ Content-Type: application/json
 
  POST http://localhost:8081/api-v1/product/games
  Content-Type: application/json
+###
+
+
+ POST http://localhost:8081/api-v1/product/update
+ Content-Type: application/json
+
+{
+    "product_name":"Minecraft",
+    "product_description":"voucher Mojang",
+    "product_number":"Qk8wWUdrczA0Y29rUlAwREowNFBsTU5pWlRkRGo1WXJqUEdoajJuZ09vL3VqRjdSREJBdFQ3R3hrTk42S3NuamZVQkJDQnYyUlkvcXNMS0pKRHh5Tnc9PQ==x",
+    "category_name":"voucher",
+    "brand":"Mojang2",
+    "product_thumbnail":"https://semutganteng.fra1.digitaloceanspaces.com/UniPlay/0f9d9f1404ecb25f44bf0c5ec289be60.png",
+    "status":"Active",
+    "published":"true"
+}
 ###
 
 

@@ -14,13 +14,18 @@ const general = require("../general");
 
 exports.addProductVariaty = async function (req, res) {
   try {
-    const response = addProductVariaty(req.body)
+    const response = await addProductVariaty(req.body)
+    console.log(response.status);
 
-    if (!response.status(200)) {
-      return res.status(response.status).send(response.message)
+
+    if (response.status == 200) {
+      return res.status(200).send(response.data)
+
     }
+    else {
+      return res.status(response.status).send(response.message)
 
-    return res.status(200).send(response.data)
+    }
 
   } catch (error) {
     console.log(error);
@@ -83,11 +88,20 @@ exports.getAllProductVariatyByProductId = async function (req, res) {
 exports.updateProductVariaty = async function (req, res) { };
 //FUNCTION
 
-async function addProductVariaty(data) {
+async function newProductVariaty(data) {
   const valid = await validation.addProductVariatyValidation(data);
+  console.log("CCC");
+  console.log(data);
+
 
   if (valid.error) {
-    return res.status(417).send(valid.error);
+    console.log(valid.error);
+
+    const error = {
+      status: 417,
+      message: valid.error
+    }
+    return error
   }
 
   const productId = await productController.getProductByName(
@@ -127,7 +141,7 @@ async function addProductVariaty(data) {
     return error;
   }
 
-  const unitId = await unitController.getUnitByName(req.body.unit_name);
+  const unitId = await unitController.getUnitByName(data.unit_name);
 
   if (unitId.length == 0) {
     const error = {
@@ -153,7 +167,7 @@ async function addProductVariaty(data) {
 
 
 
-  exist = await getProductVariatyByVariatyNumber(data.productVariatyNumber);
+  exist = await getProductVariatyByVariatyNumber(data.product_variaty_number);
 
   if (exist.length != 0) {
     const error = {
@@ -167,13 +181,13 @@ async function addProductVariaty(data) {
   let created_at = moment().valueOf();
   let updated_at = moment().valueOf();
 
-  await db.pool.query(
+  const response = await db.pool.query(
     {
       text: "INSERT INTO product_variaty(product_id, variaty_name, variaty_number, price, unit_id, currency_id, url, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
       values: [
         productId[0].id,
         data.variaty_name,
-        data.productVariatyNumber,
+        data.product_variaty_number,
         data.price,
         unitId[0].id,
         currencyId[0].id,
@@ -183,24 +197,29 @@ async function addProductVariaty(data) {
         created_at,
         updated_at,
       ],
-    },
-    (error, result) => {
-      if (error) {
-        console.log(error);
-        const error = {
-          status: 417,
-          message: error.message
-        }
-        return error
-      }
-      const data = {
+    }
+  ).then((result) => {
+    var data = {}
+    if (!result.error) {
+      data = {
         status: 200,
         message: "success",
-        result: result
+        result: result.rows
       }
-      return data
+
+    } else {
+      data = {
+        status: 417,
+        message: result.error
+      }
     }
-  );
+
+    return data
+  }
+  )
+  console.log(response);
+
+  return response;
 }
 
 async function getProductVariatyById(id) {
@@ -261,3 +280,5 @@ async function generateVariatyNumber() {
 
 module.exports.getProductVariatyByName = getProductVariatyByName;
 module.exports.getProductVariatyById = getProductVariatyById;
+
+module.exports.newProductVariaty = newProductVariaty;

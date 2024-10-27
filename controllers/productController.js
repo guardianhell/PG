@@ -8,6 +8,7 @@ const qs = require("querystring");
 const { func } = require("joi");
 const validation = require("../validations");
 const productCategoryController = require("../controllers/productCategoryController");
+const productVariatyController = require("../controllers/productVariatyController")
 const statusController = require("../controllers/statusController");
 const getProductCategoryByName =
   require("../controllers/productCategoryController").getProductCategoryByName;
@@ -17,6 +18,7 @@ const general = require("../general");
 const { default: axios } = require("axios");
 const json = require("body-parser/lib/types/json");
 const { log } = require("console");
+const { text } = require("stream/consumers");
 
 exports.addNewProduct = async function (req, res) {
   try {
@@ -24,11 +26,12 @@ exports.addNewProduct = async function (req, res) {
 
 
     if (!response.status == 200) {
+      return res.status(417).send(response.data)
+
+    }
+    else {
       return res.status(response.status).send(response.message)
     }
-
-    return res.status(417).send(response.data)
-
 
   } catch (error) {
     console.log(error);
@@ -72,7 +75,11 @@ exports.searchProductById = async function (req, res) {
   }
 };
 
-exports.updateProduct = async function (req, res) {};
+exports.updateProduct = async function (req, res) {
+
+  updateProduct(req.body)
+
+};
 
 exports.searchAllProduct = async function (res, res) {
   try {
@@ -117,10 +124,6 @@ exports.getVoucherUniplay = async function (req, res) {
   try {
     const response = await getVoucherUniplay()
     return res.send(response)
-    console.log(response);
-
-
-
   }
   catch (error) {
     return res.status(500).send(error.message)
@@ -141,35 +144,82 @@ exports.syncProductVoucherUniplay = async function (req, res) {
   try {
 
     const response = await getVoucherUniplay()
-    console.log(response);
-    console.log(response.list_voucher[0].denom);
+
+    const dataArray = response.list_voucher
+
+    console.log(dataArray);
 
 
-    response.list_voucher.forEach(async element => {
-      const exist = await getProductByProductNumber(element.id)
+    const dataLength = dataArray.length
 
-      const data = {
-        product_name: element.name,
-        product_number: element.id,
-        product_description: element.publisher_website,
-        category_name: "voucher",
-        brand: element.publisher,
-        product_thumbnail: element.image,
-        status_name: "Active",
-        publishe: false
-      }
+    const dataResult = {
+      status: 200,
+      message: "",
+      result: []
+    }
 
-      if (exist.rows > 0) {
+    for (var i = 0; i < dataLength; i++) {
 
-      }
-      else {
-        addNewProduct(data).then((result) => {
+      const exist = await getProductByProductNumber(dataArray[i].id)
 
-          ///add variaty
+      if (exist.length == 0) {
+        const data =
+        {
+          product_name: dataArray[i].name,
+          product_number: dataArray[i].id,
+          product_description: "voucher " + dataArray[i].publisher + " " + dataArray[i].publisher_website,
+          category_name: "voucher",
+          brand: dataArray[i].publisher,
+          product_thumbnail: dataArray[i].image,
+          status_name: "Active",
+          published: false
+        }
+
+        const response = await addNewProduct(data).then(async (result) => {
+          if (result.status == 200) {
+            dataResult.result.push(result)
+            for (var j = 0; j < dataArray[i].denom.length; j++) {
+
+              const dataArray2 = dataArray[i].denom[j];
+              const data2 = {
+                product_name: dataArray[i].name,
+                product_variaty_number: dataArray2.id,
+                variaty_name: dataArray2.package,
+                price: dataArray2.price,
+                unit_name: "voucher",
+                currency_name: "Rupiah",
+                url: "www.pandoorbox.com",
+                status_name: "active"
+              }
+
+              const response2 = await productVariatyController.newProductVariaty(data2).then(async (results2) => {
+                if (results2.status == 200) {
+                  dataResult.result.push(results2)
+                }
+                else {
+                  dataResult.status = result.status
+                  dataResult.message = "Failed"
+                  dataResult.result.push(result)
+                }
+              })
+
+            }
+          }
+          else {
+            dataResult.status = result.status
+            dataResult.message = "Failed"
+            dataResult.result.push(result)
+          }
         })
       }
-    })
+    }
 
+    if (dataResult.status == 200) {
+      return res.status(200).send("Data Sync Success")
+    }
+    else {
+      return res.status(dataResult.status).send("Data Sync Failed")
+    }
 
   } catch (error) {
     return res.status(500).send(error.message)
@@ -275,7 +325,6 @@ async function addNewProduct(data) {
       }
     }
 
-    console.log(data);
     return data
   })
 
@@ -450,6 +499,79 @@ async function generateProductNumber() {
   return productNumber
 }
 
+async function updateProduct(data) {
+  console.log(data);
+
+
+  const updated_at = moment().valueOf()
+
+  const result = await getProductByProductNumber(data.product_number)
+
+  var category, status = null;
+
+  console.log(data.category_name);
+
+
+  if (data.category_name) {
+    category =
+      await productCategoryController.getProductCategoryByName(
+        data.category_name
+      );
+  }
+
+  console.log(category);
+
+
+  if (category.length == 0) {
+
+    const error = {
+      status: 417,
+      message: "Invalid Product Category"
+    }
+    return error
+  }
+
+  if (data.status) {
+    status = await statusController.getStatusByName(data.status)
+  }
+
+  console.log(status);
+
+
+  if (status.length == 0) {
+    const error = {
+      status: 417,
+      message: "Invalid Status"
+    }
+    return error
+  }
+
+  // text: "UPDATE product SET product_name=COALESCE(NULLIF($1, ''), product_name), product_description=COALESCE(NULLIF($2, ''), product_description), product_category_id=COALESCE(NULLIF($3::bigint, ''), product_category_id), brand=COALESCE(NULLIF($4, ''), brand),product_thumbnail=COALESCE(NULLIF($5, ''), product_thumbnail),status=COALESCE(NULLIF($6::bigint, ''), status),published=COALESCE(NULLIF($7, ''), published),updated_at=$8 WHERE product_number=$9 RETURNING *",
+
+  const response = await db.pool.query({
+    text: "UPDATE product SET product_name=COALESCE(NULLIF($1, ''), product_name), product_description=COALESCE(NULLIF($2, ''), product_description), brand=COALESCE(NULLIF($3, ''), brand),product_thumbnail=COALESCE(NULLIF($4, ''), product_thumbnail),updated_at=$5 WHERE product_number=$6 RETURNING *",
+    values: [data.product_name, data.product_description, data.brand, data.product_thumbnail, updated_at, data.product_number]
+  }).then((results) => {
+    var data = {}
+    if (!results.error) {
+      data = {
+        status: 200,
+        message: "success",
+        result: results.rows
+      }
+
+    } else {
+      data = {
+        status: 417,
+        message: results.error
+      }
+    }
+
+    console.log(results);
+
+    return data
+  })
+}
 
 
 module.exports.getProductByName = getProductByName;
