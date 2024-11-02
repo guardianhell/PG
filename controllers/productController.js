@@ -2,6 +2,7 @@ const moment = require("moment");
 const db = require("../util/dbconnections");
 
 const router = require("express").Router();
+const moments = require('moment-timezone');
 const verify = require("../verify");
 const crypto = require("crypto");
 const qs = require("querystring");
@@ -80,6 +81,89 @@ exports.updateProduct = async function (req, res) {
   updateProduct(req.body)
 
 };
+
+exports.paymentUniplay = async function (req, res) {
+
+  const accessToken = await generateUniplayToken()
+
+  const url = "https://api-reseller.uniplay.id/v1/inquiry-payment"
+
+  const entitasId = "UWg4Yjh6SzRpMXptWVBEVk85MzNXd0lnOGlQOHBDekRySzZKMm4zVktxS09XVDRFbzgyMk9LNml6QnNrVG0xZVdIcERCLzUzaUU3NEc2ZWhrOS9rUXc9PQ=="
+
+  const denomId = "bSs5LzRrZE1MOWY0Q0pTYk1OT2d3clFMdnEyREFHM0taR0gwN1ZJMTFORlBpbnpiVEdKSFNON1dPNzBXY042b3NRa0xCTEhaZXUrNGthK2RjeVBwcEE9PQ=="
+
+  const date = await generateTimestamp()
+
+
+
+  console.log(accessToken)
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date,
+    entitas_id: entitasId,
+    denom_id: denomId
+  }
+
+  const signature = await generateUPLSignature2(data)
+
+  console.log(signature)
+
+  // const response = await axios.post(url, data, {
+  //   headers: {
+  //     "UPL-SIGNATURE": signature,
+  //     "UPL-ACCESS-TOKEN": accessToken.data.access_token
+  //   }
+  // })
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": accessToken.data.access_token
+    }
+  })
+
+
+
+  console.log(response.data)
+  return response.data
+}
+
+exports.confirmPayment = async function (req, res) {
+  try {
+
+    const url = "https://api-reseller.uniplay.id/v1/confirm-payment"
+
+    const accessToken = await generateUniplayToken()
+
+    const paymentId = "aVo0Wnd4cjZtdk9CbTRhcGxMWFlEY3hWOHEzc2tvbFlDckI3UHJ4MWlYK1hJSXpUVndSUUJkYnlKRU9qYjM3NlE5QnVLT2NORTlGTktIdEp6emNYOFE9PQ=="
+
+    const date = await generateTimestamp()
+
+    const data = {
+      api_key: process.env.UNIPLAYKEY,
+      timestamp: date,
+      inquiry_id: paymentId,
+      pincode: process.env.UPYPIN
+    }
+
+    const signature = await generateUPLSignature2(data)
+
+    const response = await axios.post(url, data, {
+      headers: {
+        "UPL-SIGNATURE": signature,
+        "UPL-ACCESS-TOKEN": accessToken.data.access_token
+      }
+    })
+
+    console.log(response);
+    return res.send(response.data)
+
+
+  } catch (error) {
+    return res.status(500).send(error.message)
+  }
+}
 
 exports.searchAllProduct = async function (res, res) {
   try {
@@ -197,9 +281,11 @@ exports.syncProductVoucherUniplay = async function (req, res) {
                   dataResult.result.push(results2)
                 }
                 else {
-                  dataResult.status = result.status
+                  console.log(results2);
+
+                  dataResult.status = result2.status
                   dataResult.message = "Failed"
-                  dataResult.result.push(result)
+                  dataResult.result2.push(result2)
                 }
               })
 
@@ -218,7 +304,9 @@ exports.syncProductVoucherUniplay = async function (req, res) {
       return res.status(200).send("Data Sync Success")
     }
     else {
-      return res.status(dataResult.status).send("Data Sync Failed")
+      console.log(dataResult)
+      return res.status(dataResult.status).send
+        ("Data Sync Failed")
     }
 
   } catch (error) {
@@ -392,9 +480,29 @@ async function generateUPLSignature(date) {
   return uplSignature
 }
 
+async function generateUPLSignature2(data) {
+
+  // const jsonArray = {
+  //   api_key: process.env.UNIPLAYKEY,
+  //   timestamp: date
+  // }
+
+  console.log("MMM " + data);
+
+
+  const jsonString = JSON.stringify(data)
+
+  const hmackey = process.env.UNIPLAYKEY + "|" + jsonString;
+  console.log(hmackey);
+
+  const uplSignature = await crypto.createHmac('sha512', hmackey).update(jsonString).digest("hex")
+
+  return uplSignature
+}
+
 async function generateTimestamp() {
   const dateFormat = "YYYY-MM-DD HH:mm:ss"
-  const datedata = moment().format(dateFormat)
+  const datedata = moments().tz('Asia/Jakarta').format(dateFormat)
   console.log(datedata);
 
   return datedata
@@ -433,9 +541,10 @@ async function getVoucherUniplay() {
 
   const responseToken = await generateUniplayToken()
   const url = "https://api-reseller.uniplay.id/v1/inquiry-voucher"
-  const date = await generateTimestamp()
-  const signature = await generateUPLSignature(date)
 
+  const date = await generateTimestamp()
+
+  console.log("TGL " + date);
 
 
   const data = {
@@ -443,6 +552,9 @@ async function getVoucherUniplay() {
     timestamp: date
   }
 
+  console.log("DATA  : " + data);
+
+  const signature = await generateUPLSignature2(data)
 
 
   const response = await axios.post(url, data, {
@@ -451,6 +563,8 @@ async function getVoucherUniplay() {
       "UPL-ACCESS-TOKEN": responseToken.data.access_token
     }
   })
+
+  console.log(response);
 
 
   return response.data

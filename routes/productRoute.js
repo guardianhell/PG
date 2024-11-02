@@ -11,5 +11,7 @@ router.post("/voucher/", productController.getVoucherUniplay)
 router.post("/games/", productController.getDTUUniplay)
 router.post("/sync/uniplay/voucher", productController.syncProductVoucherUniplay)
 router.post("/update/", productController.updateProduct)
+router.post("/paymentUPL/", productController.paymentUniplay)
+router.post("/payment-confirmed/", productController.confirmPayment)
 
 module.exports = router

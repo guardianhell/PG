@@ -49,6 +49,13 @@ exports.searchProductVariatyById = async function (req, res) {
   }
 };
 
+exports.getAllProductVariaty = async function (req, res) {
+  const response = await getAllProductVariaty()
+  console.log(response);
+
+  res.send(response.rows)
+}
+
 exports.searchProductVariatyByName = async function (req, res) {
   try {
     const valid = await validation.searchProductVariatyByProductName(

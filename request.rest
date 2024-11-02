@@ -238,6 +238,16 @@ Content-Type: application/json
  Content-Type: application/json
 ###
 
+
+ POST http://localhost:8081/api-v1/product/paymentUPL
+ Content-Type: application/json
+###
+
+POST http://localhost:8081/api-v1/product/payment-confirmed
+Content-Type: application/json
+
+###
+
  POST http://localhost:8081/api-v1/product/games
  Content-Type: application/json
 ###
@@ -263,6 +273,8 @@ Content-Type: application/json
  Content-Type: application/json
 ###
 
+ GET http://localhost:8081/api-v1/product-variaty/all
+
 
  POST http://localhost:8081/api-v1/payment-type/create
  Content-Type: application/json
@@ -271,6 +283,8 @@ Content-Type: application/json
     "TxnAmount":"10000.00"
  }
  ###
+
+
 
 
 

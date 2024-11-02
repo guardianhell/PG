@@ -8,9 +8,12 @@ router.get(
   productVariatyController.getAllProductVariatyByProductId
 );
 router.get("id/:id", productVariatyController.searchProductVariatyById);
+
 router.get(
   "/variaty-name/:product_id/:variaty_name",
   productVariatyController.searchProductVariatyByName
 );
+
+router.get("/all", productVariatyController.getAllProductVariaty)
 
 module.exports = router;

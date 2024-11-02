@@ -53,7 +53,11 @@ exports.createNewTransaction = async function (req, res) {
       return res.status(417).send("Invalid Total Amount");
     }
 
-    await db.pool.query(
+    const client = await db.pool.connect()
+
+    await client.query('BEGIN')
+
+    await client.query(
       {
         text: "INSERT INTO transaction(trx_number,user_id,total_amount,status,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
         values: [
@@ -90,8 +94,30 @@ exports.createNewTransaction = async function (req, res) {
           });
         }
 
-        return res.status(200).send(result.rows);
+
       }
+
+      // .then((result) => {
+      //   var data = {}
+      //   if (!result.error) {
+      //     client.query('COMMIT')
+      //     data = {
+      //       status: 200,
+      //       message: "success",
+      //       result: result.rows
+      //     }
+
+      //   } else {
+      //     client.query('ROLLBACK')
+      //     data = {
+      //       status: 417,
+      //       message: "Failed",
+      //       result: result.error
+      //     }
+      //   }
+      //   client.release()
+      //   res.status(data.status).send(data.result)
+      // })
     );
   } catch (error) {
     console.log(error);
