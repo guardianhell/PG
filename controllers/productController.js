@@ -82,21 +82,13 @@ exports.updateProduct = async function (req, res) {
 
 };
 
-exports.paymentUniplay = async function (req, res) {
-
+async function paymentRequestUniplay(entitasId, denomId) {
   const accessToken = await generateUniplayToken()
 
   const url = "https://api-reseller.uniplay.id/v1/inquiry-payment"
 
-  const entitasId = "UWg4Yjh6SzRpMXptWVBEVk85MzNXd0lnOGlQOHBDekRySzZKMm4zVktxS09XVDRFbzgyMk9LNml6QnNrVG0xZVdIcERCLzUzaUU3NEc2ZWhrOS9rUXc9PQ=="
-
-  const denomId = "bSs5LzRrZE1MOWY0Q0pTYk1OT2d3clFMdnEyREFHM0taR0gwN1ZJMTFORlBpbnpiVEdKSFNON1dPNzBXY042b3NRa0xCTEhaZXUrNGthK2RjeVBwcEE9PQ=="
-
   const date = await generateTimestamp()
 
-
-
-  console.log(accessToken)
 
   const data = {
     api_key: process.env.UNIPLAYKEY,
@@ -107,14 +99,6 @@ exports.paymentUniplay = async function (req, res) {
 
   const signature = await generateUPLSignature2(data)
 
-  console.log(signature)
-
-  // const response = await axios.post(url, data, {
-  //   headers: {
-  //     "UPL-SIGNATURE": signature,
-  //     "UPL-ACCESS-TOKEN": accessToken.data.access_token
-  //   }
-  // })
 
   const response = await axios.post(url, data, {
     headers: {
@@ -127,6 +111,17 @@ exports.paymentUniplay = async function (req, res) {
 
   console.log(response.data)
   return response.data
+
+}
+
+exports.paymentUniplay = async function (req, res) {
+  try {
+    paymentRequestUniplay(re)
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error.message)
+  }
+
 }
 
 exports.confirmPayment = async function (req, res) {
@@ -247,17 +242,27 @@ exports.syncProductVoucherUniplay = async function (req, res) {
       const exist = await getProductByProductNumber(dataArray[i].id)
 
       if (exist.length == 0) {
+
+        const product_number = await generateProductNumber("voucher")
+
+        console.log(product_number);
+        console.log(dataArray[i].id);
+
+
         const data =
         {
           product_name: dataArray[i].name,
-          product_number: dataArray[i].id,
+          product_number: product_number,
+          product_ref_number: dataArray[i].id,
           product_description: "voucher " + dataArray[i].publisher + " " + dataArray[i].publisher_website,
           category_name: "voucher",
           brand: dataArray[i].publisher,
+          merchant_id: 1,
           product_thumbnail: dataArray[i].image,
           status_name: "Active",
           published: false
         }
+
 
         const response = await addNewProduct(data).then(async (result) => {
           if (result.status == 200) {
@@ -265,11 +270,18 @@ exports.syncProductVoucherUniplay = async function (req, res) {
             for (var j = 0; j < dataArray[i].denom.length; j++) {
 
               const dataArray2 = dataArray[i].denom[j];
+              console.log("AAAAA");
+
+              console.log(result);
+
+              const variatyNumber = await productVariatyController.generateVariatyNumber(1)
               const data2 = {
                 product_name: dataArray[i].name,
-                product_variaty_number: dataArray2.id,
+                product_variaty_number: variatyNumber,
+                variaty_ref_number: dataArray2.id,
                 variaty_name: dataArray2.package,
-                price: dataArray2.price,
+                cost_price: dataArray2.price,
+                price: Math.trunc((dataArray2.price / 0.95)),
                 unit_name: "voucher",
                 currency_name: "Rupiah",
                 url: "www.pandoorbox.com",
@@ -283,9 +295,9 @@ exports.syncProductVoucherUniplay = async function (req, res) {
                 else {
                   console.log(results2);
 
-                  dataResult.status = result2.status
+                  dataResult.status = results2.status
                   dataResult.message = "Failed"
-                  dataResult.result2.push(result2)
+                  dataResult.result.push(results2)
                 }
               })
 
@@ -304,7 +316,7 @@ exports.syncProductVoucherUniplay = async function (req, res) {
       return res.status(200).send("Data Sync Success")
     }
     else {
-      console.log(dataResult)
+      console.log(JSON.stringify(dataResult))
       return res.status(dataResult.status).send
         ("Data Sync Failed")
     }
@@ -386,24 +398,26 @@ async function addNewProduct(data) {
 
   const response = await client.query(
     {
-      text: "INSERT INTO product(product_number, product_name , product_description, product_category_id, brand, product_thumbnail, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
+      text: "INSERT INTO product(product_number,product_ref_number, product_name , product_description, product_category_id, brand, product_thumbnail,merchant_id ,status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *",
       values: [
         data.product_number,
+        data.product_ref_number,
         data.product_name,
         data.product_description,
         productCategoryId[0].id,
         data.brand,
         data.product_thumbnail,
+        data.merchant_id,
         statusId[0].id,
         false,
         created_at,
         updated_at,
       ]
     }
-  ).then((result) => {
+  ).then(async (result) => {
     var data = {}
     if (!result.error) {
-      client.query('COMMIT')
+      await client.query('COMMIT')
       data = {
         status: 200,
         message: "success",
@@ -411,13 +425,13 @@ async function addNewProduct(data) {
       }
 
     } else {
-      client.query('ROLLBACK')
+      await client.query('ROLLBACK')
       data = {
         status: 417,
         message: result.error
       }
     }
-    client.release()
+    await client.release()
     return data
   })
 
@@ -604,7 +618,7 @@ async function getDTUUniplay() {
 
 }
 
-async function generateProductNumber() {
+async function generateProductNumber(category) {
   const productRows = await getAllProduct();
 
   const productUniqueNumber = await general.numberGenerator(
@@ -613,7 +627,7 @@ async function generateProductNumber() {
   );
 
   const productNumber =
-    "PROD-" + req.body.category_name + "-" + productUniqueNumber;
+    "PROD-" + category + "-" + productUniqueNumber;
 
   return productNumber
 }
@@ -694,3 +708,5 @@ async function updateProduct(data) {
 
 
 module.exports.getProductByName = getProductByName;
+module.exports.getProductById = getProductById;
+module.exports.paymentRequestUniplay = paymentRequestUniplay;

@@ -93,13 +93,14 @@ exports.getAllProductVariatyByProductId = async function (req, res) {
 };
 
 exports.updateProductVariaty = async function (req, res) { };
+
+
+
+
 //FUNCTION
 
 async function newProductVariaty(data) {
   const valid = await validation.addProductVariatyValidation(data);
-  console.log("CCC");
-  console.log(data);
-
 
   if (valid.error) {
     console.log(valid.error);
@@ -188,13 +189,21 @@ async function newProductVariaty(data) {
   let created_at = moment().valueOf();
   let updated_at = moment().valueOf();
 
-  const response = await db.pool.query(
+
+  const client = await db.pool.connect()
+
+  await client.query('BEGIN')
+
+
+  const response = await client.query(
     {
-      text: "INSERT INTO product_variaty(product_id, variaty_name, variaty_number, price, unit_id, currency_id, url, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
+      text: "INSERT INTO product_variaty(product_id, variaty_name, variaty_number,variaty_ref_number,cost_price ,price, unit_id, currency_id, url, status, published, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *",
       values: [
         productId[0].id,
         data.variaty_name,
         data.product_variaty_number,
+        data.variaty_ref_number,
+        data.cost_price,
         data.price,
         unitId[0].id,
         currencyId[0].id,
@@ -206,6 +215,7 @@ async function newProductVariaty(data) {
       ],
     }
   ).then((result) => {
+    client.query('COMMIT')
     var data = {}
     if (!result.error) {
       data = {
@@ -215,12 +225,13 @@ async function newProductVariaty(data) {
       }
 
     } else {
+      client.query('ROLLBACK')
       data = {
         status: 417,
         message: result.error
       }
     }
-
+    client.release()
     return data
   }
   )
@@ -271,7 +282,7 @@ async function getAllProductVariaty() {
   return result.rows;
 }
 
-async function generateVariatyNumber() {
+async function generateVariatyNumber(productId) {
 
   const productVariatyRows = await getAllProductVariaty();
 
@@ -280,12 +291,12 @@ async function generateVariatyNumber() {
     productVariatyRows.length + 1
   );
 
-  const productVariatyNumber = "VAR-" + productId[0].id + "-" + uniqueNumber;
+  const productVariatyNumber = "VAR-" + productId + "-" + uniqueNumber;
 
   return productVariatyNumber
 }
 
 module.exports.getProductVariatyByName = getProductVariatyByName;
 module.exports.getProductVariatyById = getProductVariatyById;
-
+module.exports.generateVariatyNumber = generateVariatyNumber;
 module.exports.newProductVariaty = newProductVariaty;

@@ -7,6 +7,7 @@ const { Router } = require("express");
 const productController = require("../controllers/productController");
 const productVariatyController = require("../controllers/productVariatyController");
 const statusController = require("../controllers/statusController");
+const invoiceController = require("../controllers/invoiceController")
 const general = require("../general");
 
 exports.createNewTransaction = async function (req, res) {
@@ -41,6 +42,9 @@ exports.createNewTransaction = async function (req, res) {
         array[i].product_variaty_id
       );
 
+      console.log(array[i].product_variaty_id);
+
+
       if (validProduct.length == 0) {
         return res
           .status(417)
@@ -74,14 +78,17 @@ exports.createNewTransaction = async function (req, res) {
           return res.status(417).send(error.message);
         }
 
+        var data = {}
+
         for (var i = 0; i < array.length; i++) {
           validProduct = await productVariatyController.getProductVariatyById(
             array[i].product_variaty_id
           );
+
           const price = validProduct[0].price;
           const amount = price * array[i].qty;
 
-          await db.pool.query({
+          await client.query({
             text: "INSERT INTO transaction_detail(trx_id,product_variaty_id, description,amount,qty,price) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
             values: [
               result.rows[0].id,
@@ -91,33 +98,64 @@ exports.createNewTransaction = async function (req, res) {
               array[i].qty,
               price,
             ],
+          }).then((result) => {
+
+            if (!result.error) {
+              data = {
+                status: 200,
+                message: "success",
+                result: result.rows
+              }
+
+            } else {
+              client.query('ROLLBACK')
+              data = {
+                status: 417,
+                message: "Error",
+                result: result.error
+              }
+              return res.status(data.status).send(data.message)
+            }
           });
         }
 
+        await client.query('COMMIT')
+        await client.release()
 
+        //create invoice
+
+        const invoiceData = {
+          trx_id: result.rows[0].id,
+          currency_name: 'Rupiah',
+          amount: result.rows[0].total_amount
+        }
+
+        const response = await invoiceController.createNewInvoiceFunction(invoiceData)
+
+        console.log(response);
+
+
+        if (response.status == 417) {
+          return res.status(response.status).send(response.message)
+        }
+
+        console.log(result.rows[0].id);
+
+        const trx_detail = await getTransactionDetailByTransactionId(invoiceData.trx_id)
+
+        console.log(trx_detail);
+
+        const productVariaty = await productVariatyController.getProductVariatyById(trx_detail[0].product_variaty_id)
+
+        const product = await productController.getProductById(productVariaty[0].product_id)
+
+
+
+        //get inqury to merchant
+        const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
+
+        return res.status(200).send(data)
       }
-
-      // .then((result) => {
-      //   var data = {}
-      //   if (!result.error) {
-      //     client.query('COMMIT')
-      //     data = {
-      //       status: 200,
-      //       message: "success",
-      //       result: result.rows
-      //     }
-
-      //   } else {
-      //     client.query('ROLLBACK')
-      //     data = {
-      //       status: 417,
-      //       message: "Failed",
-      //       result: result.error
-      //     }
-      //   }
-      //   client.release()
-      //   res.status(data.status).send(data.result)
-      // })
     );
   } catch (error) {
     console.log(error);
@@ -146,6 +184,16 @@ async function getTransactionById(id) {
     values: [id],
   });
   return result.rows;
+}
+
+async function getTransactionDetailByTransactionId(id) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM transaction_detail Where trx_id = $1",
+    values: [id]
+  });
+  console.log(result.rows);
+
+  return result.rows
 }
 
 module.exports.getTransactionById = getTransactionById;

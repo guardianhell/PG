@@ -44,7 +44,9 @@ exports.addProductVariatyValidation = function (data) {
   const schema = Joi.object({
     product_name: Joi.string().min(1).max(256).required(),
     product_variaty_number: Joi.string().min(1).max(256).required(),
+    variaty_ref_number: Joi.string().min(3).max(256).required(),
     variaty_name: Joi.string().min(1).max(256).required(),
+    cost_price: Joi.number().positive().required(),
     price: Joi.number().positive().required(),
     unit_name: Joi.string().min(1).max(128).required(),
     currency_name: Joi.string().min(1).max(128).required(),
@@ -75,10 +77,12 @@ exports.addProductValidation = function (data) {
   const schema = Joi.object({
     product_name: Joi.string().min(1).max(256).required(),
     product_number: Joi.string().min(6).max(256).required(),
+    product_ref_number: Joi.string().min(3).max(256).required(),
     product_description: Joi.string().min(1).max(2048).required(),
     category_name: Joi.string().min(1).max(128).required(),
     brand: Joi.string().min(1).max(265).required(),
     product_thumbnail: Joi.string(),
+    merchant_id: Joi.number().required(),
     status_name: Joi.string().min(1).max(2048).required(),
     published: Joi.boolean().default(false).required(),
   });
@@ -206,6 +210,7 @@ exports.createNewInvoiceValidation = function (data) {
   const schema = Joi.object({
     trx_id: Joi.number().min(1).max(999999999).positive().integer().required(),
     currency_name: Joi.string().min(1).max(128).required(),
+    amount: Joi.number().positive().integer()
   });
   return schema.validate(data);
 };
