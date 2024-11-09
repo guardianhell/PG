@@ -96,7 +96,7 @@ exports.createNewTransaction = async function (req, res) {
               validProduct[0].variaty_name,
               amount,
               array[i].qty,
-              price,
+              price
             ],
           }).then((result) => {
 
@@ -139,6 +139,9 @@ exports.createNewTransaction = async function (req, res) {
           return res.status(response.status).send(response.message)
         }
 
+        console.log("INVOICEEEEE" + JSON.stringify(response.result[0]));
+
+
         console.log(result.rows[0].id);
 
         const trx_detail = await getTransactionDetailByTransactionId(invoiceData.trx_id)
@@ -149,10 +152,22 @@ exports.createNewTransaction = async function (req, res) {
 
         const product = await productController.getProductById(productVariaty[0].product_id)
 
-
-
         //get inqury to merchant
         const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
+
+        const dataPayment = {
+          invoice_id: response.result[0].id,
+          amount: response.result[0].amount,
+          payment_method_id: 1,
+          payment_number: paymentRequest.inquiry_id,
+          payment_link: ""
+        }
+
+
+        console.log("XXXXXXX");
+        console.log(paymentRequest);
+
+
 
         return res.status(200).send(data)
       }

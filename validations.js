@@ -236,6 +236,11 @@ exports.createNewPaymentTypeValidation = function (data) {
 
 exports.requestNewPaymentValidation = function(data){
   const schema = Joi.object({
-    
+    invoice_id: Joi.number().min(1).max(999999999).positive().integer().required(),
+    amount: Joi.number().min(1).max(9999999999).required(),
+    payment_method_id: Joi.number().min(1).max(999999999).positive().integer().required(),
+    payment_number: Joi.string().min(1).max(256).required(),
+    payment_link: Joi.string().min(1).max(256).required(),
   })
+  return schema.validate(data)
 }

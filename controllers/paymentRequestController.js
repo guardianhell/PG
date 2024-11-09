@@ -26,84 +26,94 @@ exports.requestNewPayment = async function (req, res) {
   }
 };
 
-async function oAuthBCA() {
-  let encoded = await base64encode(
-    "18ad7213-c501-4935-9517-dbb4535053a9:6caab03e-a2cf-4367-87f0-340e46380cc2"
-  );
 
-  const params = new URLSearchParams({ "grant-type": "client_credentials" });
+async function createNewPaymentRequest(data) {
 
-  console.log(encoded);
-  console.log(moment().toISOString());
-  return;
+  const valid = await validation.requestNewPaymentValidation(data)
 
-  const data = {
-    "client-id": "TXZPIDAu6Amut9g8bWdvG4Mgmic790sv",
-    "client-secret": "GITLVGwfLoHn2RUu",
-  };
-
-  const response = await axios.post(
-    "https://sandbox.bca.co.id/api/oauth/token",
-    qs.stringify({ grant_type: "client_credentials" }),
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + encoded,
-      },
+  if (valid.error) {
+    const error = {
+      status: 417,
+      message: valid.error
     }
-  );
+    return error
+  }
 
-  return response;
-}
+  let created_at = moment().valueOf();
+  let updated_at = moment().valueOf();
 
-async function oauthBRI() {
-  const params = new URLSearchParams({ "grant-type": "client_credentials" });
+  const client = await db.pool.connect()
 
-  const data = {
-    client_id: "TXZPIDAu6Amut9g8bWdvG4Mgmic790sv",
-    client_secret: "GITLVGwfLoHn2RUu",
-  };
+  await client.query("BEGIN")
 
-  const url =
-    "https://sandbox.partner.api.bri.co.id/oauth/client_credential/accesstoken";
+  const paymentNumber = await generatePaymentNumber(created_at)
 
-  const response = await axios.post(url, qs.stringify(data), {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    params: { grant_type: "client_credentials" },
-  });
+  const response = await client.query({
+    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,created_at,updated_at) VALUES ($1,$2,$,3,$4,$5,$6,$7,$8,$9) RETURNING *",
+    values: [
+      data.invoice_id,
+      paymentNumber,
+      data.status_id,
+      data.amount,
+      data.payment_method_id,
+      data.payment_number,
+      data.payment_link,
+      created_at,
+      updated_at
+    ]
+  }).then(async (result) => {
+    var data = {}
 
-  return response.data;
-}
-
-async function b2bBRI() {
-  const timestamp = moment().toISOString();
-  const client_id = "TXZPIDAu6Amut9g8bWdvG4Mgmic790sv";
-  const signature = await crypto
-    .createHmac("sha256", process.env.PRIVATEKEY)
-    .update(client_id + "|" + timestamp)
-    .digest("hex");
-
-  const url =
-    "https://sandbox.partner.api.bri.co.id/snap/v1.0/access-token/b2b";
-
-  const response = await axios.post(
-    url,
-    {},
-    {
-      headers: {
-        "X-SIGNATURE": signature,
-        "X-CLIENT-KEY": client_id,
-        "X-TIMESTAMP": timestamp,
-        "Content-Type": "application/json",
-      },
-      params: { grant_type: "client_credentials" },
+    if (!result.error) {
+      await client.query('COMMIT')
+      data = {
+        status: 200,
+        message: "success",
+        result: result.rows
+      }
     }
-  );
-  console.log(response);
-  return response;
+    else {
+      await client.query('ROLLBACK')
+      data = {
+        status: 417,
+        message: result.error
+      }
+    }
+
+    await client.release()
+    return data
+
+  })
+
+  return response
+
 }
+
+
+async function generatePaymentNumber(date) {
+  const paymentRows = await getAllTransaction();
+
+  const paymentUniqueNumber = await general.numberGenerator(
+    5,
+    paymentRows.length + 1
+  );
+
+  const paymentNumber =
+    "PROD-" + date + "-" + paymentUniqueNumber;
+
+  return paymentNumber
+}
+
+async function getAllTransaction() {
+
+  const result = db.pool.query({
+    text: "SELECT * FROM payment_request"
+  })
+
+  return result.rows;
+
+}
+
 
 async function generateQRISE2Pay(dataBody) {
   const url = "https://pg-uat.e2pay.co.id/RMS/API/nms2us/direct_api_bridge.php";
@@ -144,5 +154,7 @@ async function generateQRISE2Pay(dataBody) {
     body: JSON.stringify(data),
   });
 
+
+  return response
   console.log(response.data);
 }
