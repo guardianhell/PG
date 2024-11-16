@@ -184,31 +184,31 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
   const data = {
-    MerchantCode: "EP001658_S005",
-    PaymentId: 21,
-    RefeNo: "TRX-TEST-001",
-    Amount: "30000",
-    Currency: "IDR",
-    ProdDesc: "Vou Game",
-    UserName: "persontest",
-    UserEmail: "person@cyberber.id",
-    UserContact: "8213112321",
-    Remark: "TEST",
-    Lang: "UTF-8",
-    Signature: signature,
-    CallBackURL: "https://ascasystem.com/hiturl",
+    "MerchantCode": "EP001658_S005",
+    "PaymentId": 21,
+    "RefNo": "TRX-TEST-001",
+    "Amount": "30000",
+    "Currency": "IDR",
+    "ProdDesc": "Vou Game",
+    "UserName": "persontest",
+    "UserEmail": "person@cyberber.id",
+    "UserContact": "8213112321",
+    "Remark": "TEST",
+    "Lang": "UTF-8",
+    "Signature": signature,
+    "CallBackURL": "https://ascasystem.com/hiturl",
   };
 
   // const response = await axios.post(url, qs.stringify(data), {});
 
-  // const response = await axios({
-  //   method: "post",
-  //   url: url,
-  //   body: JSON.stringify(data),
-  // });
+  const response = await axios({
+    method: "post",
+    url: url,
+    body: JSON.stringify(data),
+  });
 
 
-  const response = await axios.post(url, data)
+  // const response = await axios.post(url, data)
 
 
   return response.data
