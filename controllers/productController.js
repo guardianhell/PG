@@ -309,6 +309,8 @@ exports.syncProductVoucherUniplay = async function (req, res) {
             dataResult.result.push(result)
           }
         })
+      } else {
+        //UPDATE
       }
     }
 

@@ -18,6 +18,7 @@ const { time, log } = require("console");
 
 exports.requestNewPayment = async function (req, res) {
   try {
+
     const response = await generateQRISE2Pay(req.body);
     res.send(response);
   } catch (error) {
@@ -49,13 +50,13 @@ async function createNewPaymentRequest(data) {
   const paymentNumber = await generatePaymentNumber(created_at)
 
   const response = await client.query({
-    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,created_at,updated_at) VALUES ($1,$2,$,3,$4,$5,$6,$7,$8,$9) RETURNING *",
+    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,created_at,update_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
     values: [
       data.invoice_id,
       paymentNumber,
-      data.status_id,
+      1,
       data.amount,
-      data.payment_method_id,
+      1,
       data.payment_number,
       data.payment_link,
       created_at,
@@ -90,8 +91,46 @@ async function createNewPaymentRequest(data) {
 }
 
 
+exports.getPaymentByPaymentNumber = async function (req, res) {
+  try {
+    const response = await getPaymentByPaymentNumber(req.params.payment_number)
+
+    return res.status(200).send(response)
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message)
+  }
+}
+
+exports.callbackURLPaymentConfirm = async function (req, res) {
+  try {
+
+    const response = await getPaymentByPaymentNumber(req.params.paymentNumber)
+
+
+
+
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message)
+
+  }
+
+
+
+}
+
+
+
+
 async function generatePaymentNumber(date) {
   const paymentRows = await getAllTransaction();
+
+  console.log("PAYMENT ROWS");
+
+  console.log(paymentRows);
+
 
   const paymentUniqueNumber = await general.numberGenerator(
     5,
@@ -106,12 +145,24 @@ async function generatePaymentNumber(date) {
 
 async function getAllTransaction() {
 
-  const result = db.pool.query({
+  const result = await db.pool.query({
     text: "SELECT * FROM payment_request"
   })
 
+  console.log(result);
+
+
   return result.rows;
 
+}
+
+async function getPaymentByPaymentNumber(paymentNumber) {
+
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_request WHERE payment_number = $1",
+    values: [paymentNumber]
+  })
+  return result.rows
 }
 
 
@@ -133,15 +184,17 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
   const data = {
-    MerchantCode: process.env.MERCHANTCODE,
+    MerchantCode: "EP001658_S005",
     PaymentId: 21,
-    ReferenceNo: dataBody.ReferenceNo,
+    RefeNo: "TRX-TEST-001",
+    Amount: "30000",
     Currency: "IDR",
-    TxnAmount: dataBody.TxnAmount,
     ProdDesc: "Vou Game",
     UserName: "persontest",
     UserEmail: "person@cyberber.id",
-    UserContact: "82131",
+    UserContact: "8213112321",
+    Remark: "TEST",
+    Lang: "UTF-8",
     Signature: signature,
     CallBackURL: "https://ascasystem.com/hiturl",
   };
@@ -155,6 +208,11 @@ async function generateQRISE2Pay(dataBody) {
   });
 
 
-  return response
+  return response.data
   console.log(response.data);
 }
+
+
+module.exports.createNewPaymentRequest = createNewPaymentRequest
+
+
