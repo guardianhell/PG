@@ -201,11 +201,14 @@ async function generateQRISE2Pay(dataBody) {
 
   // const response = await axios.post(url, qs.stringify(data), {});
 
-  const response = await axios({
-    method: "post",
-    url: url,
-    body: JSON.stringify(data),
-  });
+  // const response = await axios({
+  //   method: "post",
+  //   url: url,
+  //   body: JSON.stringify(data),
+  // });
+
+
+  const response = await axios.post(url, data)
 
 
   return response.data
