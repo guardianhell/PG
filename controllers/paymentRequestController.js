@@ -184,10 +184,10 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
   const data = {
-    "MerchantCode": "EP001658_S005",
+    "MerchantCode": dataBody.ReferenceNo,
     "PaymentId": 21,
-    "RefNo": "TRX-TEST-001",
-    "Amount": "30000",
+    "RefNo": dataBody.TxnAmount,
+    "Amount": "10000",
     "Currency": "IDR",
     "ProdDesc": "Vou Game",
     "UserName": "persontest",
@@ -199,16 +199,14 @@ async function generateQRISE2Pay(dataBody) {
     "CallBackURL": "https://ascasystem.com/hiturl",
   };
 
-  // const response = await axios.post(url, qs.stringify(data), {});
-
-  const response = await axios({
-    method: "post",
-    url: url,
-    body: JSON.stringify(data),
-  });
 
 
-  // const response = await axios.post(url, data)
+
+  const response = await axios.post(url, data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
 
 
   return response.data
