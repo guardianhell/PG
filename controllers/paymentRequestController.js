@@ -50,7 +50,7 @@ async function createNewPaymentRequest(data) {
   const paymentNumber = await generatePaymentNumber(created_at)
 
   const response = await client.query({
-    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,created_at,update_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
+    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor,created_at,update_at,) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
     values: [
       data.invoice_id,
       paymentNumber,
@@ -59,6 +59,8 @@ async function createNewPaymentRequest(data) {
       1,
       data.payment_number,
       data.payment_link,
+      data.expire_date,
+      data.payment_vendor,
       created_at,
       updated_at
     ]
@@ -184,10 +186,10 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
   const data = {
-    "MerchantCode": dataBody.ReferenceNo,
+    "MerchantCode": merchantCode,
     "PaymentId": 21,
-    "RefNo": dataBody.TxnAmount,
-    "Amount": "10000",
+    "RefNo": dataBody.ReferenceNo,
+    "Amount": dataBody.TxnAmount,
     "Currency": "IDR",
     "ProdDesc": "Vou Game",
     "UserName": "persontest",
@@ -210,10 +212,11 @@ async function generateQRISE2Pay(dataBody) {
 
 
   return response.data
-  console.log(response.data);
 }
 
 
 module.exports.createNewPaymentRequest = createNewPaymentRequest
+
+module.exports.generateQRISE2Pay = generateQRISE2Pay
 
 

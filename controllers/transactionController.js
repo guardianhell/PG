@@ -156,31 +156,39 @@ exports.createNewTransaction = async function (req, res) {
         //get inqury to merchant
         const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
 
+        const pgdata = {
+          ReferenceNo: trx_number,
+          TxnAmount: req.body.total_amount
+        }
 
         //MUST GENERATE to PG REquest
+        const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
+
+        console.log(pgRespond);
+
+        if (pgRespond.Code != "00") {
+          return res.status(400).send(pgRespond)
+        }
+
+
+
 
 
         const dataPayment = {
           invoice_id: response.result[0].id,
           amount: response.result[0].amount,
           payment_method_id: 1,
-          payment_number: paymentRequest.inquiry_id,
-          payment_link: "www.linkpayment.qr",
+          payment_number: pgRespond.TransId,
+          payment_link: pgRespond.Data.QRCode,
+          payment_vendor: paymentRequest.inquiry_id,
+          expire_date: pgRespond.ExpireDate,
         }
 
-        console.log("XXXXXXX");
-        console.log(paymentRequest);
+
 
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log("YYYYYYYY");
         console.log(paymentRequestResult);
-
-
-
-
-
-
 
 
 
