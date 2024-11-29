@@ -66,7 +66,7 @@ async function createNewPaymentRequest(data) {
       data.payment_vendor,
       created_at,
       updated_at,
-    ]
+    ],
   }).then(async (result) => {
     var data = {}
 
