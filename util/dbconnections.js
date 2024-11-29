@@ -20,24 +20,24 @@ const getPassword = async () => await signer.getAuthToken(signerOptions)
 
 
 
-const pool = new Pool({
-  user: signerOptions.username,
-  password: process.env.RDSPASSWORD,
-  host: signerOptions.hostname,
-  port: signerOptions.port,
-  database: process.env.RDSDBNAME,
-  ssl: {
-    rejectUnauthorized: false
-  }
-})
-
 // const pool = new Pool({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "pandoorbox",
-//   password: "!V1nzt3r91",
-//   port: 5432,
-// });
+//   user: signerOptions.username,
+//   password: process.env.RDSPASSWORD,
+//   host: signerOptions.hostname,
+//   port: signerOptions.port,
+//   database: process.env.RDSDBNAME,
+//   ssl: {
+//     rejectUnauthorized: false
+//   }
+// })
+
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "pandoorbox",
+  password: "!V1nzt3r91",
+  port: 5432,
+});
 
 module.exports = {
   pool,
