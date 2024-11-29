@@ -99,9 +99,9 @@ POST http://localhost:8081/api-v1/product/add
 Content-Type: application/json
 
 {
-    "product_name":"Mobile Legend Bang Bang Bang Bang26",
+    "product_name":"Mobile Legend Bang Bang Bang Bang2",
     "product_description":"MOBA GAMES By Moon Toon",
-    "product_number":"PRD-31-132-00026",
+    "product_number":"PRD-31-132-0002",
     "category_name":"Games",
     "brand":"moon toon",
     "product_thumbnail":"https://www.stanleyulili.com/node/node-modules-import-and-use-functions-from-another-file",
@@ -171,7 +171,7 @@ Content-Type: application/json
 
 {
    "user_id":1,
-   "total_amount":2500,
+   "total_amount":10224,
    "status_name":"Waiting for Payment",
    "product":
    [{
@@ -179,7 +179,7 @@ Content-Type: application/json
     "qty":1
    },
    {
-    "product_variaty_id":"2",
+    "product_variaty_id":"1",
     "qty":1
    }],
    "currency_name":"Rupiah"
@@ -238,16 +238,6 @@ Content-Type: application/json
  Content-Type: application/json
 ###
 
-
- POST http://localhost:8081/api-v1/product/paymentUPL
- Content-Type: application/json
-###
-
-POST http://localhost:8081/api-v1/product/payment-confirmed
-Content-Type: application/json
-
-###
-
  POST http://localhost:8081/api-v1/product/games
  Content-Type: application/json
 ###
@@ -259,7 +249,7 @@ Content-Type: application/json
 {
     "product_name":"Minecraft",
     "product_description":"voucher Mojang",
-    "product_number":"Qk8wWUdrczA0Y29rUlAwREowNFBsTU5pWlRkRGo1WXJqUEdoajJuZ09vL3VqRjdSREJBdFQ3R3hrTk42S3NuamZVQkJDQnYyUlkvcXNMS0pKRHh5Tnc9PQ==x",
+    "product_number":"NGQrMlloaXRnQTdIOHNobHgwV0NRSGZ0VGNoMWhsaG1kOEI2cHpMZHZXbzhYamdlUHMwN00vQXFFdlBlTkc3bG1xdThzTG9sQmR3L2xkWlZVakc4VWc9PQ==",
     "category_name":"voucher",
     "brand":"Mojang2",
     "product_thumbnail":"https://semutganteng.fra1.digitaloceanspaces.com/UniPlay/0f9d9f1404ecb25f44bf0c5ec289be60.png",
@@ -273,18 +263,21 @@ Content-Type: application/json
  Content-Type: application/json
 ###
 
- GET http://localhost:8081/api-v1/product-variaty/all
-
 
  POST http://localhost:8081/api-v1/payment-type/create
  Content-Type: application/json
 
  {
-    "TxnAmount":"10000.00"
+    "payment":"QRIS",
+    "bank" : "E2Pay",
+    "account_name":"E2PAY",
+    "account_number" : "123441241",
+    "payment_fee_chrg_to_system" : "0.4",
+    "payment_fee_chrg_to_customer" : "0",
+    "timelimit_payment": "600",
+    "status_name":"active"
  }
  ###
-
-
 
 
 
