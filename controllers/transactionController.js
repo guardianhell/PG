@@ -181,8 +181,9 @@ exports.createNewTransaction = async function (req, res) {
           payment_number: pgRespond.TransId,
           payment_link: pgRespond.Data.QRCode,
           payment_vendor: paymentRequest.inquiry_id,
-          expire_date: pgRespond.ExpireDate,
+          expire_date: pgRespond.Data.ExpireDate,
         }
+
 
 
 
