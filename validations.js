@@ -242,7 +242,7 @@ exports.requestNewPaymentValidation = function(data){
     payment_number: Joi.string().min(1).max(256).required(),
     payment_link: Joi.string().min(1).max(256).required(),
     payment_vendor: Joi.string().min(1).max(256).required(),
-    expire_date: Joi.date().timestamp('unix'),
+    expire_date: Joi.date().timestamp(),
   })
   return schema.validate(data)
 }
