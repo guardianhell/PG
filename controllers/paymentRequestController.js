@@ -53,7 +53,7 @@ async function createNewPaymentRequest(data) {
 
 
   const response = await client.query({
-    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor,created_at,update_at,) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
+    text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor,created_at,update_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
     values: [
       data.invoice_id,
       paymentNumber,
@@ -143,7 +143,7 @@ async function generatePaymentNumber(date) {
   );
 
   const paymentNumber =
-    "PROD-" + date + "-" + paymentUniqueNumber;
+    "PYRQ-" + date + "-" + paymentUniqueNumber;
 
   return paymentNumber
 }
