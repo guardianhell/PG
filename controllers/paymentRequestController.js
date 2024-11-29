@@ -49,6 +49,9 @@ async function createNewPaymentRequest(data) {
 
   const paymentNumber = await generatePaymentNumber(created_at)
 
+  console.log(paymentNumber);
+
+
   const response = await client.query({
     text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor,created_at,update_at,) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
     values: [
@@ -62,7 +65,7 @@ async function createNewPaymentRequest(data) {
       data.expire_date,
       data.payment_vendor,
       created_at,
-      updated_at
+      updated_at,
     ]
   }).then(async (result) => {
     var data = {}
@@ -129,7 +132,7 @@ exports.callbackURLPaymentConfirm = async function (req, res) {
 async function generatePaymentNumber(date) {
   const paymentRows = await getAllTransaction();
 
-  console.log("PAYMENT ROWS");
+
 
   console.log(paymentRows);
 
