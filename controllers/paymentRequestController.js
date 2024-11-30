@@ -110,9 +110,12 @@ exports.getPaymentByPaymentNumber = async function (req, res) {
 exports.callbackURLPaymentConfirm = async function (req, res) {
   try {
 
-    const paymentData = await getPaymentByPaymentNumber(req.params.paymentNumber)
+    const paymentData = await getPaymentByPaymentNumber(req.body.TransId)
 
-    if (response.length == 0) {
+    console.log(paymentData);
+
+
+    if (paymentData.length == 0) {
       return res.status(417).send("Transaction Not Found")
     }
 
@@ -255,7 +258,7 @@ async function generateQRISE2Pay(dataBody) {
     "Remark": "TEST",
     "Lang": "UTF-8",
     "Signature": signature,
-    "CallBackURL": "https://ascasystem.com/hiturl",
+    "CallBackURL": "http://pandoorbox.com:" + process.env.PORT + "/api-v1/e2p/trx/callback/" + dataBody.ReferenceNo,
   };
 
 
