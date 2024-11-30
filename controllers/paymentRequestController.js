@@ -129,6 +129,9 @@ exports.callbackURLPaymentConfirm = async function (req, res) {
 
       const updatePaymentResponse = await updatePaymentStatus(paymentData[0].id, statusId)
 
+      console.log(updatePaymentResponse);
+
+
       const updateInvoiceResponse = await invoiceController.updateInvoiceStatusById(paymentData[0].invoice_id, statusId)
 
 
