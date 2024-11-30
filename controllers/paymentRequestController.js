@@ -110,20 +110,34 @@ exports.getPaymentByPaymentNumber = async function (req, res) {
 exports.callbackURLPaymentConfirm = async function (req, res) {
   try {
 
-    const response = await getPaymentByPaymentNumber(req.params.paymentNumber)
+    const paymentData = await getPaymentByPaymentNumber(req.params.paymentNumber)
+
+    if (response.length == 0) {
+      return res.status(417).send("Transaction Not Found")
+    }
+
+    //Checking Signature
+
+    if (req.body.status == 1) {
+
+      const settlementResponse = await paymentSettlement(response[0].id, req.body.AuthCode)
+
+      const statusId = await statusController.getStatusByName("paid")
+
+      const updatePaymentResponse = await updatePaymentStatus(paymentData[0].id, statusId)
+
+      const updateInvoiceResponse = await invoiceController.updateInvoiceStatusById(paymentData[0].invoice_id, statusId)
 
 
+    }
 
-
+    return res.status(200).send("OK")
 
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message)
 
   }
-
-
-
 }
 
 
@@ -163,6 +177,46 @@ async function getAllTransaction() {
 
 async function getPaymentByPaymentNumber(paymentNumber) {
 
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_request WHERE payment_number = $1",
+    values: [paymentNumber]
+  })
+  return result.rows
+}
+
+async function getPaymentByInvoiceId(invoiceId) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_request WHERE invoice_id = $1",
+    values: [invoiceId]
+  })
+  return result.rows
+}
+
+async function updatePaymentStatus(id, statusId) {
+  const result = await db.pool.query({
+    text: "UPDATE payment_request SET status = $1 WHERE id = $2 RETURNING *",
+    values: [statusId, id]
+  })
+  return result
+}
+
+async function getPaymentByPaymentVendorIdentifier(paymentVendorIdentifier) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_request WHERE payment_vendor_identifier = $1",
+    values: [paymentVendorIdentifier]
+  })
+  return result.rows
+}
+
+async function getPaymentById(id) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_request WHERE id = $1",
+    values: [id]
+  })
+  return result.rows
+}
+
+async function getPaymentByPaymentNumber(paymentNumber) {
   const result = await db.pool.query({
     text: "SELECT * FROM payment_request WHERE payment_number = $1",
     values: [paymentNumber]
@@ -215,6 +269,69 @@ async function generateQRISE2Pay(dataBody) {
 
 
   return response.data
+}
+
+async function paymentSettlement(paymentId, refValidationNumber) {
+
+  const data = {}
+  const paymentData = getPaymentById(paymentId)
+
+  if (paymentData.length == 0) {
+    return data = {
+      status: 417,
+      message: "Data Payment Not Found"
+    }
+  }
+
+  const invoiceData = invoiceController.getInvoiceById(paymentData[0].invoice_id)
+
+  if (invoiceData.length == 0) {
+    return data = {
+      status: 417,
+      message: "Invoice not found"
+    }
+  }
+
+  const created_at = moment().valueOf()
+  const updated_at = moment().valueOf()
+
+  const statusId = statusController.getStatusByName("Valid")
+
+  const client = await db.pool.connect()
+
+  await client.query("BEGIN")
+
+  await client.query({
+    text: "INSERT INTO settlement(transaction_id,payment_id,ref_validation_number,status,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6 ) RETURNING *",
+    values: [
+      invoiceData[0].trx_id,
+      paymentData[0].id,
+      refValidationNumber,
+      statusId[0].id,
+      created_at,
+      updated_at
+    ]
+  }).then(async (result) => {
+    if (!result.error) {
+      await client.query("COMMIT")
+      data = {
+        status: 200,
+        message: "success",
+        result: result.rows
+      }
+    }
+    else {
+      await client.query("ROLLBACK")
+      data = {
+        status: 417,
+        message: "error",
+        result: result.rows
+      }
+    }
+    await client.release()
+    return data
+  })
+
 }
 
 

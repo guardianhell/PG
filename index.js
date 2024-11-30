@@ -18,6 +18,7 @@ const transactionRoute = require("./routes/transactionRoute");
 const invoiceRoute = require("./routes/invoiceRoute");
 const paymentTypeRoute = require("./routes/paymentTypeRoute");
 const paymentRequestRoute = require("./routes/paymentRequestRoute");
+const callbackRoute = require("./routes/callbackRoute")
 
 const port = process.env.PORT || 5000;
 
@@ -39,6 +40,7 @@ app.use(urlAPI + "/transaction", transactionRoute);
 app.use(urlAPI + "/invoice", invoiceRoute);
 app.use(urlAPI + "/payment-type", paymentTypeRoute);
 app.use(urlAPI + "/payment", paymentRequestRoute);
+app.use(urlAPI + "/e2p/trx", callbackRoute)
 
 app.listen(port, function () {
   console.log("Server started on port " + port);

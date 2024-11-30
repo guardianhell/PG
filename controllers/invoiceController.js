@@ -216,5 +216,22 @@ async function getInvoiceByTrxId(id) {
   return result.rows;
 }
 
+async function getInvoiceById(id) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM invoices where id = $1",
+    values: [id]
+  })
+  return result.rows
+}
+
+async function updateInvoiceStatusById(id, statusId) {
+  const result = await db.pool.query({
+    text: "UPDATE invoices SET status = $1 WHERE id = $2 RETURNING *",
+    values: [statusId, id]
+  })
+  return result.rows
+}
+module.exports.updateInvoiceStatusById = updateInvoiceStatusById
+module.exports.getInvoiceById = getInvoiceById;
 module.exports.getInvoiceByTrxId = getInvoiceByTrxId;
 module.exports.createNewInvoiceFunction = createNewInvoiceFunction

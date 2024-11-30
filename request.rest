@@ -172,7 +172,6 @@ Content-Type: application/json
 {
    "user_id":1,
    "total_amount":10224,
-   "status_name":"Waiting for Payment",
    "product":
    [{
     "product_variaty_id":"1",
@@ -187,6 +186,13 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:8081/api-v1/e2p/trx
+Content-Type: application/json
+{
+
+}
+
+###
 GET http://localhost:8081/api-v1/transaction/
 
 

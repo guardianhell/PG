@@ -19,7 +19,7 @@ exports.createNewTransaction = async function (req, res) {
       return res.status(417).send(valid.error);
     }
 
-    statusId = await statusController.getStatusByName(req.body.status_name);
+    statusId = await statusController.getStatusByName("Waiting for Payment");
 
     if (statusId.length == 0) {
       return res.status(417).send("Invalid Status");
@@ -189,11 +189,14 @@ exports.createNewTransaction = async function (req, res) {
 
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log(paymentRequestResult);
+        if (paymentRequestResult.status == 417) {
+          return res.status(417).send(paymentRequestResult.message)
+        }
 
 
 
-        return res.status(200).send(data)
+
+        return res.status(200).send(pgRespond)
       }
     );
   } catch (error) {
