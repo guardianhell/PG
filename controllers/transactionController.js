@@ -58,6 +58,8 @@ exports.createNewTransaction = async function (req, res) {
       return res.status(417).send("Invalid Total Amount");
     }
 
+    const manipulationTotalAmount = req.body.total_amount + "00"
+
     const client = await db.pool.connect()
 
     await client.query('BEGIN')
@@ -68,7 +70,7 @@ exports.createNewTransaction = async function (req, res) {
         values: [
           trx_number,
           user_id,
-          req.body.total_amount,
+          manipulationTotalAmount,
           statusId[0].id,
           created_at,
           updated_at,
@@ -158,7 +160,7 @@ exports.createNewTransaction = async function (req, res) {
 
         const pgdata = {
           ReferenceNo: trx_number,
-          TxnAmount: req.body.total_amount
+          TxnAmount: manipulationTotalAmount
         }
 
         //MUST GENERATE to PG REquest
@@ -196,12 +198,13 @@ exports.createNewTransaction = async function (req, res) {
 
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log("HIGHLIGHT : " + paymentRequestResult);
+        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
 
-        if (paymentRequestResult.status == 417) {
-          return res.status(417).send(paymentRequestResult.message)
-        }
+
+        // if (paymentRequestResult.status == 417) {
+        //   return res.status(417).send(paymentRequestResult.message)
+        // }
 
 
 
