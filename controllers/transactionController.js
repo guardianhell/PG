@@ -196,6 +196,9 @@ exports.createNewTransaction = async function (req, res) {
 
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
+        console.log("HIGHLIGHT : " + paymentRequestResult);
+
+
         if (paymentRequestResult.status == 417) {
           return res.status(417).send(paymentRequestResult.message)
         }
