@@ -187,7 +187,7 @@ exports.createNewTransactionValidation = function (data) {
   const schema = Joi.object({
     user_id: Joi.number().min(1).max(9999).positive().integer().required(),
     total_amount: Joi.number().min(1).max(9999999999).required(),
-    status_name: Joi.string().min(1).max(2048).required(),
+    //status_name: Joi.string().min(1).max(2048).required(),
     product: Joi.array()
       .items({
         product_variaty_id: Joi.number()
@@ -226,7 +226,7 @@ exports.createNewPaymentTypeValidation = function (data) {
     payment_fee_chrg_to_system: Joi.number().min(0).max(100).required(),
     payment_fee_chrg_to_customer: Joi.number().min(0).max(100).required(),
     timelimit_payment: Joi.number().min(60).max(604800).required(),
-    // status_name: Joi.string().min(1).max(128).required(),
+    status_name: Joi.string().min(1).max(128).required(),
   });
   return schema.validate(data);
 };
