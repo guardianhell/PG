@@ -226,7 +226,7 @@ exports.createNewPaymentTypeValidation = function (data) {
     payment_fee_chrg_to_system: Joi.number().min(0).max(100).required(),
     payment_fee_chrg_to_customer: Joi.number().min(0).max(100).required(),
     timelimit_payment: Joi.number().min(60).max(604800).required(),
-    status_name: Joi.string().min(1).max(128).required(),
+    // status_name: Joi.string().min(1).max(128).required(),
   });
   return schema.validate(data);
 };
