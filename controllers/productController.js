@@ -552,23 +552,71 @@ async function generateUniplayToken() {
   return response
 }
 
-
 async function getVoucherUniplay() {
 
+  const productCategoryId = await productCategoryController.getProductCategoryByName("voucher")
+
+  console.log(productCategoryId);
+
+
+  const response = await db.pool.query({
+    text: "SELECT * FROM product WHERE product_category_id = $1",
+    values: [productCategoryId[0].id]
+  })
+
+  console.log(response);
+
+
+  return response.rows
+
+}
+
+
+// async function getVoucherUniplay() {
+
+//   const responseToken = await generateUniplayToken()
+//   const url = "https://api-reseller.uniplay.id/v1/inquiry-voucher"
+
+//   const date = await generateTimestamp()
+
+//   console.log("TGL " + date);
+
+
+//   const data = {
+//     api_key: process.env.UNIPLAYKEY,
+//     timestamp: date
+//   }
+
+//   console.log("DATA  : " + data);
+
+//   const signature = await generateUPLSignature2(data)
+
+
+//   const response = await axios.post(url, data, {
+//     headers: {
+//       "UPL-SIGNATURE": signature,
+//       "UPL-ACCESS-TOKEN": responseToken.data.access_token
+//     }
+//   })
+
+//   console.log(response);
+
+
+//   return response.data
+
+// }
+
+
+async function getDTUUniplay() {
+
   const responseToken = await generateUniplayToken()
-  const url = "https://api-reseller.uniplay.id/v1/inquiry-voucher"
-
+  const url = "https://api-reseller.uniplay.id/v1/inquiry-dtu"
   const date = await generateTimestamp()
-
-  console.log("TGL " + date);
-
 
   const data = {
     api_key: process.env.UNIPLAYKEY,
     timestamp: date
   }
-
-  console.log("DATA  : " + data);
 
   const signature = await generateUPLSignature2(data)
 
@@ -580,41 +628,10 @@ async function getVoucherUniplay() {
     }
   })
 
-  console.log(response);
 
+  // console.log(response.data.list_dtu.splice(0, 10));
 
-  return response.data
-
-}
-
-
-async function getDTUUniplay() {
-
-  const responseToken = await generateUniplayToken()
-  const url = "https://api-reseller.uniplay.id/v1/inquiry-dtu"
-  const date = await generateTimestamp()
-  const signature = await generateUPLSignature(date)
-
-
-
-  const data = {
-    api_key: process.env.UNIPLAYKEY,
-    timestamp: date
-  }
-
-
-
-  const response = await axios.post(url, data, {
-    headers: {
-      "UPL-SIGNATURE": signature,
-      "UPL-ACCESS-TOKEN": responseToken.data.access_token
-    }
-  })
-
-
-  console.log(response.data.list_dtu.splice(0, 10));
-
-  return response.data.list_dtu.splice(0, 10)
+  return response.data.list_dtu.slice(0, 10)
 
 
 
@@ -681,8 +698,6 @@ async function updateProduct(data) {
     return error
   }
 
-  // text: "UPDATE product SET product_name=COALESCE(NULLIF($1, ''), product_name), product_description=COALESCE(NULLIF($2, ''), product_description), product_category_id=COALESCE(NULLIF($3::bigint, ''), product_category_id), brand=COALESCE(NULLIF($4, ''), brand),product_thumbnail=COALESCE(NULLIF($5, ''), product_thumbnail),status=COALESCE(NULLIF($6::bigint, ''), status),published=COALESCE(NULLIF($7, ''), published),updated_at=$8 WHERE product_number=$9 RETURNING *",
-
   const response = await db.pool.query({
     text: "UPDATE product SET product_name=COALESCE(NULLIF($1, ''), product_name), product_description=COALESCE(NULLIF($2, ''), product_description), brand=COALESCE(NULLIF($3, ''), brand),product_thumbnail=COALESCE(NULLIF($4, ''), product_thumbnail),updated_at=$5 WHERE product_number=$6 RETURNING *",
     values: [data.product_name, data.product_description, data.brand, data.product_thumbnail, updated_at, data.product_number]
@@ -709,6 +724,64 @@ async function updateProduct(data) {
 }
 
 
+async function confirmPayment(paymentId) {
+
+  const url = "https://api-reseller.uniplay.id/v1/confirm-payment"
+
+  const accessToken = await generateUniplayToken()
+
+  const date = await generateTimestamp()
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date,
+    inquiry_id: paymentId,
+    pincode: process.env.UPYPIN
+  }
+
+  const signature = await generateUPLSignature2(data)
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": accessToken.data.access_token
+    }
+  })
+
+  return response.data
+
+}
+
+async function checkOrderUniPlay(orderId) {
+
+  const url = "https://api-reseller.uniplay.id/v1/check-order"
+
+  const accessToken = await generateUniplayToken()
+
+  const date = await generateTimestamp()
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date,
+    order_id: orderId
+  }
+
+  const signature = await generateUPLSignature2(data)
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": accessToken.data.access_token
+    }
+  })
+
+  return response
+
+}
+
+module.exports.confirmPayment = confirmPayment
 module.exports.getProductByName = getProductByName;
 module.exports.getProductById = getProductById;
 module.exports.paymentRequestUniplay = paymentRequestUniplay;
+module.exports.generateTimestamp = generateTimestamp
+module.exports.generateUPLSignature2 = generateUPLSignature2

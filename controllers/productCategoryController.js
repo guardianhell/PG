@@ -117,4 +117,5 @@ async function getProductCategoryById(id) {
   return result.rows;
 }
 
+
 module.exports.getProductCategoryByName = getProductCategoryByName;

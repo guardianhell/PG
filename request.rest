@@ -190,7 +190,9 @@ POST http://localhost:8081/api-v1/e2p/trx/callback
 Content-Type: application/json
 
 {
-    "TransId" : "A0000424172"
+    "TransId" : "A0000424172",
+    "Status" : 1,
+    "AuthCode" : "RB0000000"
 }
 
 ###

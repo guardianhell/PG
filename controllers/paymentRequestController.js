@@ -7,6 +7,7 @@ const validation = require("../validations");
 const { Router } = require("express");
 const { minify } = require("uglify-js");
 const paymentTypeController = require("../controllers/paymentTypeController");
+const productController = require("../controllers/productController")
 const statusController = require("../controllers/statusController");
 const invoiceController = require("../controllers/invoiceController");
 const general = require("../general");
@@ -121,16 +122,19 @@ exports.callbackURLPaymentConfirm = async function (req, res) {
 
     //Checking Signature
 
-    if (req.body.status == 1) {
+    const validSignature = await validateSignature(req.body)
 
-      const settlementResponse = await paymentSettlement(response[0].id, req.body.AuthCode)
+    if (!validSignature) {
+      return res.status(400).send("Invalid Response")
+    }
+
+    if (req.body.Status == 1) {
+
+      const settlementResponse = await paymentSettlement(paymentData[0].id, req.body.AuthCode)
 
       const statusId = await statusController.getStatusByName("paid")
 
       const updatePaymentResponse = await updatePaymentStatus(paymentData[0].id, statusId)
-
-      console.log(updatePaymentResponse);
-
 
       const updateInvoiceResponse = await invoiceController.updateInvoiceStatusById(paymentData[0].invoice_id, statusId)
 
@@ -199,9 +203,11 @@ async function getPaymentByInvoiceId(invoiceId) {
 }
 
 async function updatePaymentStatus(id, statusId) {
+
+  const updated_at = moment().valueOf()
   const result = await db.pool.query({
-    text: "UPDATE payment_request SET status = $1 WHERE id = $2 RETURNING *",
-    values: [statusId, id]
+    text: "UPDATE payment_request SET status = $1, updated_at = $2 WHERE id = $3 RETURNING *",
+    values: [statusId, updated_at, id]
   })
   return result
 }
@@ -230,6 +236,57 @@ async function getPaymentByPaymentNumber(paymentNumber) {
   return result.rows
 }
 
+async function validateSignature(data) {
+  const merchantKey = process.env.MERCHANTKEY
+  const merchantCode = process.env.MERCHANTCODE
+  const paymentID = data.PaymentId
+  const refNo = data.RefNo
+  const amount = data.Amount
+  const currency = data.Currency
+  const status = data.Status
+  const responseSignature = data.Signature
+
+  const validSignature = crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
+
+  if (validSignature === responseSignature) {
+    return true
+  }
+  else {
+    return false
+  }
+
+
+}
+
+async function settlementToVendorUPL(paymentId) {
+
+  const url = "https://api-reseller.uniplay.id/v1/confirm-payment"
+
+  const accessToken = await generateUniplayToken()
+
+  const date = await productController.generateTimestamp()
+
+  const data = {
+    api_key: process.env.UNIPLAYKEY,
+    timestamp: date,
+    inquiry_id: paymentId,
+    pincode: process.env.UPYPIN
+  }
+
+  const signature = await productController.generateUPLSignature2(data)
+
+  const response = await axios.post(url, data, {
+    headers: {
+      "UPL-SIGNATURE": signature,
+      "UPL-ACCESS-TOKEN": accessToken.data.access_token
+    }
+  })
+
+  return response.data
+
+
+
+}
 
 async function generateQRISE2Pay(dataBody) {
   const url = "https://pg-uat.e2pay.co.id/RMS/API/nms2us/direct_api_bridge.php";
@@ -335,6 +392,10 @@ async function paymentSettlement(paymentId, refValidationNumber) {
       }
     }
     await client.release()
+
+    //SettlementToVendor
+    const responseSettlementVendor = await productController.confirmPayment(paymentData[0].payment_link)
+
     return data
   })
 
@@ -342,7 +403,7 @@ async function paymentSettlement(paymentId, refValidationNumber) {
 
 
 module.exports.createNewPaymentRequest = createNewPaymentRequest
-
+module.exports.validateSignature = validateSignature
 module.exports.generateQRISE2Pay = generateQRISE2Pay
 
 
