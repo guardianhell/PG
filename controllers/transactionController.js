@@ -198,9 +198,9 @@ exports.createNewTransaction = async function (req, res) {
 
 
 
-        // if (paymentRequestResult.status == 417) {
-        //   return res.status(417).send(paymentRequestResult.message)
-        // }
+        if (paymentRequestResult.status === 417) {
+          return res.status(417).send(paymentRequestResult.message)
+        }
 
 
 
