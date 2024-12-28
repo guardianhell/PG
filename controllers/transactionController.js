@@ -156,19 +156,25 @@ exports.createNewTransaction = async function (req, res) {
         //get inqury to merchant
         const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
 
+        console.log(paymentRequest);
+
+
         const pgdata = {
           ReferenceNo: trx_number,
           TxnAmount: manipulationTotalAmount
         }
 
+        return
+
         //MUST GENERATE to PG REquest
         const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
-        const validSignature = await paymentRequestController.validateSignature(pgRespond)
+        // const validSignature = await paymentRequestController.validateSignature(pgRespond)
 
-        if (!validSignature) {
-          return res.status(400).send("Invalid Response")
-        }
+        // if (!validSignature) {
+
+        //   return res.status(400).send("Invalid Response")
+        // }
 
 
         console.log(pgRespond);
