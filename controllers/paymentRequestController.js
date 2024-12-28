@@ -160,7 +160,7 @@ async function generatePaymentNumber(date) {
 
   const paymentUniqueNumber = await general.numberGenerator(
     5,
-    paymentRows[0] + 1
+    paymentRows[0].count + 1
   );
 
   const paymentNumber =

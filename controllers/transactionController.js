@@ -164,7 +164,6 @@ exports.createNewTransaction = async function (req, res) {
           TxnAmount: manipulationTotalAmount
         }
 
-        return
 
         //MUST GENERATE to PG REquest
         const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
@@ -182,7 +181,6 @@ exports.createNewTransaction = async function (req, res) {
         if (pgRespond.Code != "00") {
           return res.status(400).send(pgRespond)
         }
-
 
 
         const dataPayment = {

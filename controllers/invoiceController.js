@@ -162,7 +162,7 @@ exports.createNewInvoice = async function (req, res) {
       "-" +
       date.getFullYear() +
       "-" +
-      parseInt(invRows[0] + 1);
+      parseInt(invRows[0].count + 1);
 
     let created_at = moment().valueOf();
 
