@@ -61,7 +61,7 @@ async function createNewInvoiceFunction(data) {
     return response
   }
 
-  const invRows = await getAllInvoice();
+  const invRows = await countInvoiceRows();
 
   const date = new Date();
 
@@ -71,7 +71,7 @@ async function createNewInvoiceFunction(data) {
     "-" +
     date.getFullYear() +
     "-" +
-    parseInt(invRows.length + 1);
+    parseInt(invRows[0].count + 1);
 
   let created_at = moment().valueOf();
 
