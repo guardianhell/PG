@@ -246,7 +246,7 @@ async function validateSignature(data) {
   const status = data.Status
   const responseSignature = data.Signature
 
-  const validSignature = crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
+  const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
 
   if (validSignature === responseSignature) {
     return true
