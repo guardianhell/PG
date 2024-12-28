@@ -31,10 +31,10 @@ exports.registerNewMerchant = async function (req, res) {
       return res.status(417).send("Invalid Status");
     }
 
-    const merchantRows = await getAllMerchant();
+    const merchantRows = await countMechantRows();
     const uniqueNumber = await general.numberGenerator(
       5,
-      merchantRows.length + 1
+      merchantRows[0].count + 1
     );
 
     const merchantNumber = "MRT-" + uniqueNumber;
@@ -129,6 +129,12 @@ async function getMerchantByName(name) {
 
 async function getAllMerchant() {
   const result = await db.pool.query({ text: "SELECT * FROM merchant" });
+
+  return result.rows;
+}
+
+async function countMechantRows() {
+  const result = await db.pool.query({ text: "SELECT COUNT(*) FROM merchant" });
 
   return result.rows;
 }

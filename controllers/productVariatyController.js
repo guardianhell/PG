@@ -282,13 +282,20 @@ async function getAllProductVariaty() {
   return result.rows;
 }
 
+async function countProductVariatyRows() {
+  const result = await db.pool.query({
+    text: "SELECT COUNT(*) FROM product_variaty",
+  });
+  return result.rows;
+}
+
 async function generateVariatyNumber(productId) {
 
-  const productVariatyRows = await getAllProductVariaty();
+  const productVariatyRows = await countProductVariatyRows();
 
   const uniqueNumber = await general.numberGenerator(
     9,
-    productVariatyRows.length + 1
+    productVariatyRows[0].count + 1
   );
 
   const productVariatyNumber = "VAR-" + productId + "-" + uniqueNumber;

@@ -471,6 +471,11 @@ async function getAllProduct() {
   return result.rows;
 }
 
+async function countProductRows() {
+  const result = await db.pool.query({ text: "SELECT COUNT(*) FROM product" });
+  return result.rows;
+}
+
 async function getAllPublishedProduct() {
   const result = await db.pool.query({
     text: "SELECT * FROM product where published = true",
@@ -638,11 +643,11 @@ async function getDTUUniplay() {
 }
 
 async function generateProductNumber(category) {
-  const productRows = await getAllProduct();
+  const productRows = await countProductRows();
 
   const productUniqueNumber = await general.numberGenerator(
     5,
-    productRows.length + 1
+    productRows[0].count + 1
   );
 
   const productNumber =

@@ -28,9 +28,9 @@ exports.createNewTransaction = async function (req, res) {
     let created_at = moment().valueOf();
     let updated_at = moment().valueOf();
 
-    const trxRows = await getAllTransaction();
+    const trxRows = await countTranscationRows();
     let trx_number =
-      "TX-" + moment().valueOf() + "-" + parseInt(trxRows.length + 1);
+      "TX-" + moment().valueOf() + "-" + parseInt(trxRows[0].count + 1);
     let user_id = 1;
     var validProduct;
     var total_amount = 0;
@@ -230,6 +230,11 @@ exports.searchTransactionByInvoiceId = async function (req, res) {};
 
 async function getAllTransaction() {
   const result = await db.pool.query({ text: "SELECT * FROM transaction" });
+  return result.rows;
+}
+
+async function countTranscationRows() {
+  const result = await db.pool.query({ text: "SELECT COUNT(*) FROM transaction" });
   return result.rows;
 }
 
