@@ -42,10 +42,6 @@ exports.createNewTransaction = async function (req, res) {
       validProduct = await productVariatyController.getProductVariatyById(
         array[i].product_variaty_id
       );
-
-      console.log(array[i].product_variaty_id);
-
-
       if (validProduct.length == 0) {
         return res
           .status(417)
@@ -53,6 +49,8 @@ exports.createNewTransaction = async function (req, res) {
       }
       total_amount = total_amount + validProduct[0].price * array[i].qty;
     }
+
+
 
     if (total_amount != req.body.total_amount) {
       return res.status(417).send("Invalid Total Amount");
@@ -70,7 +68,7 @@ exports.createNewTransaction = async function (req, res) {
         values: [
           trx_number,
           user_id,
-          manipulationTotalAmount,
+          req.body.total_amount,
           statusId[0].id,
           created_at,
           updated_at,
@@ -142,14 +140,14 @@ exports.createNewTransaction = async function (req, res) {
           return res.status(response.status).send(response.message)
         }
 
-        console.log("INVOICEEEEE" + JSON.stringify(response.result[0]));
+        // console.log("INVOICEEEEE" + JSON.stringify(response.result[0]));
 
 
-        console.log(result.rows[0].id);
+        // console.log(result.rows[0].id);
 
         const trx_detail = await getTransactionDetailByTransactionId(invoiceData.trx_id)
 
-        console.log(trx_detail);
+        // console.log(trx_detail);
 
         const productVariaty = await productVariatyController.getProductVariatyById(trx_detail[0].product_variaty_id)
 
@@ -166,11 +164,11 @@ exports.createNewTransaction = async function (req, res) {
         //MUST GENERATE to PG REquest
         const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
-        // const validSignature = await paymentRequestController.validateSignature(pgdata)
+        const validSignature = await paymentRequestController.validateSignature(pgRespond)
 
-        // if (!validSignature) {
-        //   return res.status(400).send("Invalid Response")
-        // }
+        if (!validSignature) {
+          return res.status(400).send("Invalid Response")
+        }
 
 
         console.log(pgRespond);
@@ -178,8 +176,6 @@ exports.createNewTransaction = async function (req, res) {
         if (pgRespond.Code != "00") {
           return res.status(400).send(pgRespond)
         }
-
-
 
 
 
@@ -195,10 +191,10 @@ exports.createNewTransaction = async function (req, res) {
 
 
 
-
+        //Saving Payment Gateway Responses to DB
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
+        // console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult.status));
 
 
 
