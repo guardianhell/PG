@@ -152,7 +152,7 @@ exports.createNewInvoice = async function (req, res) {
     }
 
     console.log(currency);
-    const invRows = await getAllInvoice();
+    const invRows = await countInvoiceRows();
 
     const date = new Date();
 
@@ -162,7 +162,7 @@ exports.createNewInvoice = async function (req, res) {
       "-" +
       date.getFullYear() +
       "-" +
-      parseInt(invRows.length + 1);
+      parseInt(invRows[0] + 1);
 
     let created_at = moment().valueOf();
 
@@ -205,6 +205,11 @@ exports.searchInvoiceByTransactionId = async function (req, res) {};
 
 async function getAllInvoice() {
   const result = await db.pool.query({ text: "SELECT * FROM invoices" });
+  return result.rows;
+}
+
+async function countInvoiceRows() {
+  const result = await db.pool.query({ text: "SELECT COUNT(*) FROM invoices" });
   return result.rows;
 }
 

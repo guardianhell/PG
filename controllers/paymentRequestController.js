@@ -154,21 +154,17 @@ exports.callbackURLPaymentConfirm = async function (req, res) {
 
 
 async function generatePaymentNumber(date) {
-  const paymentRows = await getAllTransaction();
+  const paymentRows = await countTransactionRows();
 
-
-
-  console.log(paymentRows);
 
 
   const paymentUniqueNumber = await general.numberGenerator(
     5,
-    paymentRows.length + 1
+    paymentRows[0] + 1
   );
 
   const paymentNumber =
     "PYRQ-" + date + "-" + paymentUniqueNumber;
-
   return paymentNumber
 }
 
@@ -178,8 +174,14 @@ async function getAllTransaction() {
     text: "SELECT * FROM payment_request"
   })
 
-  console.log(result);
+  return result.rows;
 
+}
+
+async function countTransactionRows() {
+  const result = await db.pool.query({
+    text: "SELECT COUNT(*) FROM payment_request"
+  })
 
   return result.rows;
 
