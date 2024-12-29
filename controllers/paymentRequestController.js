@@ -244,8 +244,8 @@ async function validateSignature(data) {
   const paymentID = data.PaymentId
   const refNo = data.RefNo
   const amount = data.Amount
-  const currency = data.Currency
-  const status = data.Status
+  const currency = "IDR"
+  const status = 1
   const responseSignature = data.Signature
 
   const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
