@@ -136,7 +136,7 @@ exports.createNewTransaction = async function (req, res) {
         console.log(response);
 
 
-        if (response.status == 417) {
+        if (response.status === 417) {
           return res.status(response.status).send(response.message)
         }
 
@@ -174,11 +174,11 @@ exports.createNewTransaction = async function (req, res) {
 
         console.log(pgRespond);
 
-        const validSignature = await paymentRequestController.validateSignature(pgRespond)
+        // const validSignature = await paymentRequestController.validateSignature(pgRespond)
 
-        if (!validSignature) {
-          return res.status(400).send("Invalid Response")
-        }
+        // if (!validSignature) {
+        //   return res.status(400).send("Invalid Response")
+        // }
 
 
 

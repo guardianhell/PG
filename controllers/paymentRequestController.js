@@ -247,7 +247,7 @@ async function validateSignature(data) {
   const refNo = data.RefNo
   const amount = data.Amount
   const currency = "IDR"
-  const status = 1
+  const status = data.TransId
   const responseSignature = data.Signature
 
   console.log("MK : " + merchantKey);
