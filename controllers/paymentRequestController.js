@@ -239,6 +239,8 @@ async function getPaymentByPaymentNumber(paymentNumber) {
 }
 
 async function validateSignature(data) {
+
+
   const merchantKey = process.env.MERCHANTKEY
   const merchantCode = process.env.MERCHANTCODE
   const paymentID = data.PaymentId
@@ -247,6 +249,22 @@ async function validateSignature(data) {
   const currency = "IDR"
   const status = 1
   const responseSignature = data.Signature
+
+  console.log("MK : " + merchantKey);
+  console.log("MC : " + merchantCode);
+  console.log("PID : " + paymentID);
+  console.log("RN : " + refNo);
+  console.log("Amount : " + amount);
+  console.log("curr : " + currency)
+  console.log("Status : " + status);
+  console.log("RES SIGN DAT : " + responseSignature);
+
+
+
+
+
+
+
 
   const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
 

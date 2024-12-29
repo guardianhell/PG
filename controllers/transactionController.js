@@ -172,6 +172,8 @@ exports.createNewTransaction = async function (req, res) {
         //MUST GENERATE to PG REquest
         const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
+        console.log(pgRespond);
+
         const validSignature = await paymentRequestController.validateSignature(pgRespond)
 
         if (!validSignature) {
@@ -179,7 +181,7 @@ exports.createNewTransaction = async function (req, res) {
         }
 
 
-        console.log(pgRespond);
+
 
         if (pgRespond.Code != "00") {
           return res.status(400).send(pgRespond)
