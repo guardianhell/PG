@@ -330,10 +330,20 @@ async function generateQRISE2Pay(dataBody) {
     headers: {
       'Content-Type': 'application/json'
     }
+  }).then((res) => {
+    return res.data
+  }).catch((error) => {
+    console.log("ERRROS");
+
+    //console.error(error)
+    const errorData = {
+      Code: "500",
+      message: error.message
+    }
+    return errorData
   })
 
-
-  return response.data
+  return response
 }
 
 async function paymentSettlement(paymentId, refValidationNumber) {

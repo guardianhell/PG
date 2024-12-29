@@ -156,6 +156,10 @@ exports.createNewTransaction = async function (req, res) {
         //get inqury to merchant
         const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
 
+        if (paymentRequest.code === "500") {
+          return res.status(500).send(paymentRequest.message)
+        }
+
         console.log(paymentRequest);
 
 

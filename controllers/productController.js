@@ -85,6 +85,10 @@ exports.updateProduct = async function (req, res) {
 async function paymentRequestUniplay(entitasId, denomId) {
   const accessToken = await generateUniplayToken()
 
+  if (accessToken.Code === "500") {
+    return accessToken
+  }
+
   const url = "https://api-reseller.uniplay.id/v1/inquiry-payment"
 
   const date = await generateTimestamp()
@@ -105,12 +109,19 @@ async function paymentRequestUniplay(entitasId, denomId) {
       "UPL-SIGNATURE": signature,
       "UPL-ACCESS-TOKEN": accessToken.data.access_token
     }
+  }).then((res) => {
+    return res.data
+  }).catch((error) => {
+    console.error(error)
+    const errorData = {
+      Code: "500",
+      message: error.message
+    }
+    return errorData
   })
 
 
-
-  console.log(response.data)
-  return response.data
+  return response
 
 }
 
@@ -548,10 +559,17 @@ async function generateUniplayToken() {
       'Content-Type': "application/json"
     }
   }
-  )
+  ).then((res) => {
+    return res
+  }).catch((error) => {
+    console.log(error);
 
-  console.log(response.data);
-
+    const errorData = {
+      Code: '500',
+      message: error.message
+    }
+    return errorData
+  })
 
 
   return response
