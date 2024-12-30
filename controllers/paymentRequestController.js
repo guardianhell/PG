@@ -336,7 +336,7 @@ async function generateQRISE2Pay(dataBody) {
     "RefNo": dataBody.ReferenceNo,
     "Amount": dataBody.TxnAmount,
     "Currency": "IDR",
-    "ProdDesc": "Vou Game",
+    "ProdDesc": dataBody.ProdDesc,
     "UserName": "persontest",
     "UserEmail": "person@cyberber.id",
     "UserContact": "8213112321",
