@@ -194,7 +194,6 @@ exports.createNewTransaction = async function (req, res) {
           invoice_id: response.result[0].id,
           amount: response.result[0].amount,
           payment_method_id: 1,
-          RefNo: trx_number,
           payment_number: pgRespond.TransId,
           payment_link: pgRespond.Data.QRCode,
           payment_vendor: paymentRequest.inquiry_id,
@@ -206,7 +205,7 @@ exports.createNewTransaction = async function (req, res) {
         //Saving Payment Gateway Responses to DB
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
+        // console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
 
 
