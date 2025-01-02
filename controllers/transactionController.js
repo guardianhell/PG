@@ -194,6 +194,7 @@ exports.createNewTransaction = async function (req, res) {
           invoice_id: response.result[0].id,
           amount: response.result[0].amount,
           payment_method_id: 1,
+          RefNo: pgRespond.RefNo,
           payment_number: pgRespond.TransId,
           payment_link: pgRespond.Data.QRCode,
           payment_vendor: paymentRequest.inquiry_id,
