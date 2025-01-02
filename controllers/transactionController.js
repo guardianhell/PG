@@ -205,7 +205,7 @@ exports.createNewTransaction = async function (req, res) {
         //Saving Payment Gateway Responses to DB
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        // console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
+        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
 
 
