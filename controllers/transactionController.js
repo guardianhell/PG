@@ -205,7 +205,7 @@ exports.createNewTransaction = async function (req, res) {
         //Saving Payment Gateway Responses to DB
         const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
+
 
 
 
@@ -213,8 +213,9 @@ exports.createNewTransaction = async function (req, res) {
           return res.status(417).send(paymentRequestResult.message)
         }
 
+        paymentRequest.result[0].RefNo = trx_number
 
-
+        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
         return res.status(200).send(paymentRequestResult)
       }
