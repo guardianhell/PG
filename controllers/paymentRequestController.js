@@ -330,6 +330,12 @@ async function generateQRISE2Pay(dataBody) {
 
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
+
+  const user = db.pool.query({ text: "SELECT * FROM user WHERE $1", values: [req.user.id] })
+
+  console.log(user);
+
+
   const data = {
     "MerchantCode": merchantCode,
     "PaymentId": 21,
@@ -340,7 +346,7 @@ async function generateQRISE2Pay(dataBody) {
     "UserName": "persontest",
     "UserEmail": "person@cyberber.id",
     "UserContact": "8213112321",
-    "Remark": "TEST",
+    "Remark": "PandoorBox - " + dataBody.ProdDesc,
     "Lang": "UTF-8",
     "Signature": signature,
     "CallBackURL": "http://pandoorbox.com:" + process.env.PORT + "/api-v1/e2p/trx/callback/" + dataBody.ReferenceNo,

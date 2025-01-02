@@ -10,12 +10,23 @@ module.exports = async function (req, res, next) {
 
     token = token.replace("Authorization=", "");
 
-    const verified = await jwt.verify(token, process.env.AUTHTOKEN);
-
-    console.log(verified);
-
-    req.user = verified;
-    next();
+    const verified = await jwt.verify(
+      token,
+      process.env.AUTHTOKEN,
+      (error, result) => {
+        if (error) {
+          const errorMessage = {
+            Code: 401,
+            message: "Forbidden",
+          };
+          return res.status(401).send(errorMessage);
+        } else {
+          console.log(result);
+          req.user = result;
+          next();
+        }
+      }
+    );
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message);
