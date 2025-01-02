@@ -333,7 +333,11 @@ async function generateQRISE2Pay(dataBody) {
 
   const user = await db.pool.query({ text: "SELECT * FROM users WHERE id = $1", values: [dataBody.user_id] })
 
-  console.log(user);
+  const userData = user.rows[0]
+
+  const userName = userData.first_name + " " + userData.last_name
+
+  const userEmail = userData.email
 
 
   const data = {
@@ -343,9 +347,9 @@ async function generateQRISE2Pay(dataBody) {
     "Amount": dataBody.TxnAmount,
     "Currency": "IDR",
     "ProdDesc": dataBody.ProdDesc,
-    "UserName": "persontest",
-    "UserEmail": "person@cyberber.id",
-    "UserContact": "8213112321",
+    "UserName": userName,
+    "UserEmail": userEmail,
+    "UserContact": "08100000000",
     "Remark": "PandoorBox - " + dataBody.ProdDesc,
     "Lang": "UTF-8",
     "Signature": signature,
