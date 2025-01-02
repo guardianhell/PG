@@ -31,7 +31,7 @@ exports.createNewTransaction = async function (req, res) {
     const trxRows = await countTranscationRows();
     let trx_number =
       "TX-" + moment().valueOf() + "-" + parseInt(trxRows[0].count + 1);
-    let user_id = 1;
+    let user_id = req.user.id;
     var validProduct;
     var total_amount = 0;
     console.log(trx_number);
