@@ -213,7 +213,6 @@ exports.createNewTransaction = async function (req, res) {
           return res.status(417).send(paymentRequestResult.message)
         }
 
-        paymentRequest.result[0].RefNo = trx_number
 
         console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
