@@ -333,7 +333,7 @@ async function generateQRISE2Pay(dataBody) {
 
   // const user = db.pool.query({ text: "SELECT * FROM user WHERE $1", values: [req.user.id] })
 
-  console.log(user);
+  // console.log(user);
 
 
   const data = {
