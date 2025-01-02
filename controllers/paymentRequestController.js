@@ -331,7 +331,7 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
 
-  const user = db.pool.query({ text: "SELECT * FROM user WHERE $1", values: [dataBody.user_id] })
+  const user = await db.pool.query({ text: "SELECT * FROM user WHERE $1", values: [dataBody.user_id] })
 
   console.log(user);
 
