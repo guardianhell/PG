@@ -4,9 +4,7 @@ const paymentRequestController = require("../controllers/paymentRequestControlle
 const verify = require("../verify");
 
 router.post("/create", verify, transactionController.createNewTransaction);
-router.get("/", async function (req, res) {
-  return res.send("HAI");
-});
+router.get("/transactionList", verify, transactionController.getTransactionByUserId)
 
 
 

@@ -225,6 +225,19 @@ exports.createNewTransaction = async function (req, res) {
   }
 };
 
+exports.getTransactionByUserId = async function (req, res) {
+  try {
+
+    const response = await getTransactionByUserId(req.user.id)
+
+    return response
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message)
+  }
+}
+
 exports.searchTransactionByUserId = async function (req, res) {};
 
 exports.searchTransactionByTransactionId = async function (req, res) {};
@@ -251,6 +264,14 @@ async function getTransactionById(id) {
     values: [id],
   });
   return result.rows;
+}
+
+async function getTransactionByUserId(userId) {
+  const result = await db.pool.query({
+    text: "SELECT transaction.id,trx_number,transaction.created_at, status_name, variaty_name,product_thumbnail FROM public.transaction INNER JOIN status on transaction.status = status.idINNER JOIN transaction_detail on transaction.id = transaction_detail.id INNER JOIN product_variaty on transaction_detail.product_variaty_id = product_variaty.id INNER JOIN product on product_variaty.product_id = product.id WHERE user_id = $1",
+    values: [userId]
+  })
+  return result.rows
 }
 
 async function getTransactionDetailByTransactionId(id) {
