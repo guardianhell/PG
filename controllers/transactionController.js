@@ -268,7 +268,7 @@ async function getTransactionById(id) {
 
 async function getTransactionByUserId(userId) {
   const result = await db.pool.query({
-    text: "SELECT transaction.id,trx_number,transaction.created_at, status_name, variaty_name,product_thumbnail total_amount FROM public.transaction INNER JOIN status on transaction.status = status.id INNER JOIN transaction_detail on transaction.id = transaction_detail.id INNER JOIN product_variaty on transaction_detail.product_variaty_id = product_variaty.id INNER JOIN product on product_variaty.product_id = product.id WHERE user_id = $1",
+    text: "SELECT transaction.id,trx_number,transaction.created_at, status_name, variaty_name,product_thumbnail,total_amount FROM public.transaction INNER JOIN status on transaction.status = status.id INNER JOIN transaction_detail on transaction.id = transaction_detail.id INNER JOIN product_variaty on transaction_detail.product_variaty_id = product_variaty.id INNER JOIN product on product_variaty.product_id = product.id WHERE user_id = $1",
     values: [userId]
   })
   console.log(result.rows);
