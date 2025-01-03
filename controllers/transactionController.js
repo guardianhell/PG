@@ -230,7 +230,7 @@ exports.getTransactionByUserId = async function (req, res) {
 
     const response = await getTransactionByUserId(req.user.id)
 
-    return response
+    return res.send(200).send(response)
 
   } catch (error) {
     console.log(error);
