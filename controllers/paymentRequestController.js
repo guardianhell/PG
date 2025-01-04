@@ -32,6 +32,8 @@ exports.requestNewPayment = async function (req, res) {
 exports.repaymentRequest = async function (req, res) {
   try {
 
+    console.log(req.trx_id);
+
 
     const paymentRequestHistoryData = await getPaymentDataByTrxId(req.trx_id).then((res) => {
       return res
