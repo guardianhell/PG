@@ -553,6 +553,8 @@ async function generateQRISE2Pay(dataBody) {
       'Content-Type': 'application/json'
     }
   }).then((res) => {
+    console.log(res);
+
     return res.data
   }).catch((error) => {
     console.log("ERRROS");
