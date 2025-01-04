@@ -29,6 +29,27 @@ exports.requestNewPayment = async function (req, res) {
 };
 
 
+exports.repaymentRequest = async function (req, res) {
+  try {
+
+    const paymentRequestHistoryData = await getPaymentDataByTrxId(req.trx_id).then((res) => {
+      return res
+    }).catch((error) => {
+      console.log(error);
+      res.status(400).send(error.message)
+    })
+
+
+    console.log(paymentRequestHistoryData);
+
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message)
+
+  }
+}
+
 async function createNewPaymentRequest(data) {
 
   const valid = await validation.requestNewPaymentValidation(data)
@@ -234,6 +255,14 @@ async function getPaymentByPaymentNumber(paymentNumber) {
   const result = await db.pool.query({
     text: "SELECT * FROM payment_request WHERE payment_number = $1",
     values: [paymentNumber]
+  })
+  return result.rows
+}
+
+async function getPaymentDataByTrxId(trxId) {
+  const result = await db.pool.query({
+    text: "SELECT payment_request.id, invoice_id, payment_request_number, status, amount, payment_method_id, payment_number, payment_link, expire_date, payment_request.created_at, payment_request.payment_vendor_identifier FROM payment_request INNER JOIN invoices ON payment_request.invoice_id = invoices.id INNER JOIN transaction ON invoices.trx_id = transaction.id WHERE transaction.id = $1",
+    values: [trxId]
   })
   return result.rows
 }
