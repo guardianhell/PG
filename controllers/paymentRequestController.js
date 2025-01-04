@@ -133,6 +133,9 @@ exports.repaymentRequest = async function (req, res) {
         return res.status(400).send(pgRespond)
       }
 
+      console.log(pgRespond);
+
+
       const dataPayment = {
         invoice_id: invoice[0].id,
         amount: transactionData[0].total_amount,
