@@ -289,6 +289,16 @@ async function countProductVariatyRows() {
   return result.rows;
 }
 
+async function getProductAndProductDetailByProductDetailId(productDetailId) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM product INNER JOIN product_variaty ON product.id = product.variaty.product_id WHERE product_variaty.id = $1",
+    values: [productDetailId]
+  })
+
+  return result.rows
+
+}
+
 async function generateVariatyNumber(productId) {
 
   const productVariatyRows = await countProductVariatyRows();
@@ -303,6 +313,7 @@ async function generateVariatyNumber(productId) {
   return productVariatyNumber
 }
 
+module.exports.getProductAndProductDetailByProductDetailId = getProductAndProductDetailByProductDetailId;
 module.exports.getProductVariatyByName = getProductVariatyByName;
 module.exports.getProductVariatyById = getProductVariatyById;
 module.exports.generateVariatyNumber = generateVariatyNumber;

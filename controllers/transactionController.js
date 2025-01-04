@@ -268,7 +268,7 @@ async function getTransactionById(id) {
 
 async function getTransactionAndTransactionDetailById(id) {
   const result = await db.pool.query({
-    text: "SELECT transaction.id,trx_number,total_amount, transaction_detail.description FROM transaction INNER JOIN transaction_detail ON transaction.id = transaction_detail.trx_id WHERE transaction.id = $1",
+    text: "SELECT transaction.id,trx_number,total_amount,transaction_detail.product_variaty_id ,transaction_detail.description FROM transaction INNER JOIN transaction_detail ON transaction.id = transaction_detail.trx_id WHERE transaction.id = $1",
     values: [id],
   });
   return result.rows;

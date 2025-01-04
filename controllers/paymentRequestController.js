@@ -9,6 +9,7 @@ const { minify } = require("uglify-js");
 const paymentTypeController = require("../controllers/paymentTypeController");
 const transactionController = require("../controllers/transactionController")
 const productController = require("../controllers/productController")
+const productVariatyController = require("../controllers/productVariatyController")
 const statusController = require("../controllers/statusController");
 const invoiceController = require("../controllers/invoiceController");
 const general = require("../general");
@@ -70,12 +71,52 @@ exports.repaymentRequest = async function (req, res) {
           user_id: req.user.id
         }
 
+        console.log("CREATING NEW PAYMENT");
+
+        const pgRespond = await generateQRISE2Pay(pgdata)
+
+        if (pgRespond.Code != "00") {
+          return res.status(400).send(pgRespond)
+        }
+
+        const dataPayment = {
+          id: paymentRequestHistoryData[0].id,
+          payment_number: pgRespond.TransId,
+          payment_link: pgRespond.Data.QRCode,
+          payment_vendor: paymentRequest.inquiry_id,
+          expire_date: pgRespond.Data.ExpireDate,
+        }
+
+        console.log("UPDATING DATABASE");
+
+        const paymentUpdate = await updatePaymentRequest(dataPayment)
+
+        if (paymentUpdate.status == 417) {
+          return res.status(417).send(paymentUpdate)
+        }
+
+        res.status(200).send(paymentUpdate)
+
       }
 
     } else {
 
 
       const transactionData = await transactionController.getTransactionAndTransactionDetailById(req.body.trx_id)
+
+      const invoice = await invoiceController.getInvoiceByTrxId(req.body.trx_id)
+
+
+      //get transaction variaty product and product ref
+
+      const productData = await productVariatyController.getProductAndProductDetailByProductDetailId(transactionData[0].product_variaty_id)
+
+
+      const paymentRequest = await productController.paymentRequestUniplay(productData[0].product_ref_number, productData[0].variaty_ref_number)
+
+      if (paymentRequest.Code === "500") {
+        return res.status(500).send(paymentRequest.message)
+      }
 
 
       //setup PG DATA new based on transaction data
@@ -85,44 +126,35 @@ exports.repaymentRequest = async function (req, res) {
         ProdDesc: transactionData[0].description,
         user_id: req.user.id
       }
-    }
-
-
-
-
-    // create new pgresponse
-
-    console.log("CREATING NEW PAYMENT");
-
-
-      //generate new payment request to PG
-    const pgRespond = await generateQRISE2Pay(pgdata)
+      console.log("CREATING NEW PAYMENT");
+      const pgRespond = await generateQRISE2Pay(pgdata)
 
       if (pgRespond.Code != "00") {
         return res.status(400).send(pgRespond)
       }
 
-
       const dataPayment = {
-        id: paymentRequestHistoryData[0].id,
+        invoice_id: invoice[0].id,
+        amount: transactionData[0].total_amount,
+        payment_method_id: 1,
         payment_number: pgRespond.TransId,
         payment_link: pgRespond.Data.QRCode,
         payment_vendor: paymentRequest.inquiry_id,
         expire_date: pgRespond.Data.ExpireDate,
       }
 
-      //Update to DB
+      const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
 
-      const paymentUpdate = await updatePaymentRequest(dataPayment)
 
-      if (paymentUpdate.status == 417) {
-        return res.status(417).send(paymentUpdate)
+      if (paymentRequestResult.status === 417) {
+        return res.status(417).send(paymentRequestResult.message)
       }
 
-      res.status(200).send(paymentUpdate)
+      console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
+      return res.status(200).send(paymentRequestResult)
 
-
+    }
 
   } catch (error) {
     console.log(error);
