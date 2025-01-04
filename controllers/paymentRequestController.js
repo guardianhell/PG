@@ -96,7 +96,7 @@ exports.repaymentRequest = async function (req, res) {
 
 
       //generate new payment request to PG
-      pgResponse = await generateQRISE2Pay(pgdata)
+    const pgRespond = await generateQRISE2Pay(pgdata)
 
       if (pgRespond.Code != "00") {
         return res.status(400).send(pgRespond)
