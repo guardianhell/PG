@@ -291,7 +291,7 @@ async function countProductVariatyRows() {
 
 async function getProductAndProductDetailByProductDetailId(productDetailId) {
   const result = await db.pool.query({
-    text: "SELECT * FROM product INNER JOIN product_variaty ON product.id = product.variaty.product_id WHERE product_variaty.id = $1",
+    text: "SELECT * FROM product INNER JOIN product_variaty ON product.id = product_variaty.product_id WHERE product_variaty.id = $1",
     values: [productDetailId]
   })
 
