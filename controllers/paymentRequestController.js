@@ -7,6 +7,7 @@ const validation = require("../validations");
 const { Router } = require("express");
 const { minify } = require("uglify-js");
 const paymentTypeController = require("../controllers/paymentTypeController");
+const transactionController = require("../controllers/transactionController")
 const productController = require("../controllers/productController")
 const statusController = require("../controllers/statusController");
 const invoiceController = require("../controllers/invoiceController");
@@ -44,22 +45,56 @@ exports.repaymentRequest = async function (req, res) {
     console.log(paymentRequestHistoryData);
 
 
-    if (paymentRequestHistoryData.length == 0) {
-      return res.status(400).send("Transaction is not valid")
+    let pgdata = {
+      ReferenceNo: null,
+      TxnAmount: null,
+      ProdDesc: null,
+      user_id: null
     }
 
-    if (paymentRequestHistoryData[0].expire_date > moment().valueOf()) {
-      //Return Payment History Data
-      return res.status(200).send(paymentRequestHistoryData)
-    } else {
-      console.log("CREATING NEW PAYMENT");
+    //SHOULD MAKE Payment request to PG and Save to PAyment_request DB
+    if (paymentRequestHistoryData.length > 0) {
 
-      const pgdata = {
-        ReferenceNo: paymentRequestHistoryData[0].trx_number,
-        TxnAmount: paymentRequestHistoryData[0].amount + "00",
-        ProdDesc: paymentRequestHistoryData[0].description,
+
+      if (paymentRequestHistoryData[0].expire_date > moment().valueOf()) {
+        //Return Payment History Data
+        return res.status(200).send(paymentRequestHistoryData)
+      } else {
+
+        //setup PGDATA based on paymentHistory
+
+        pgdata = {
+          ReferenceNo: paymentRequestHistoryData[0].trx_number,
+          TxnAmount: paymentRequestHistoryData[0].amount + "00",
+          ProdDesc: paymentRequestHistoryData[0].description,
+          user_id: req.user.id
+        }
+
+      }
+
+    } else {
+
+
+      const transactionData = await transactionController.getTransactionAndTransactionDetailById(req.body.trx_id)
+
+
+      //setup PG DATA new based on transaction data
+      pgdata = {
+        ReferenceNo: transactionData[0].trx_number,
+        TxnAmount: transactionData[0].total_amount + "00",
+        ProdDesc: transactionData[0].description,
         user_id: req.user.id
       }
+    }
+
+
+
+
+    // create new pgresponse
+
+    console.log("CREATING NEW PAYMENT");
+
+
       //generate new payment request to PG
       pgResponse = await generateQRISE2Pay(pgdata)
 
@@ -86,7 +121,6 @@ exports.repaymentRequest = async function (req, res) {
 
       res.status(200).send(paymentUpdate)
 
-    }
 
 
 
@@ -128,6 +162,9 @@ async function updatePaymentRequest(data) {
   })
 
   await client.release()
+
+  console.log(response);
+
   return response
 
 }

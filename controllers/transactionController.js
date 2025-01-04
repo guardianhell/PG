@@ -266,6 +266,14 @@ async function getTransactionById(id) {
   return result.rows;
 }
 
+async function getTransactionAndTransactionDetailById(id) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM transaction INNER JOIN transaction_detail ON transaction.id = transaction_detail.trx_id WHERE id = $1",
+    values: [id],
+  });
+  return result.rows;
+}
+
 async function getTransactionByUserId(userId) {
   const result = await db.pool.query({
     text: "SELECT transaction.id,trx_number,transaction.created_at, status_name, variaty_name,product_thumbnail,total_amount,transaction.status FROM transaction INNER JOIN status on transaction.status = status.id INNER JOIN transaction_detail on transaction.id = transaction_detail.trx_id INNER JOIN product_variaty on transaction_detail.product_variaty_id = product_variaty.id INNER JOIN product on product_variaty.product_id = product.id WHERE user_id = $1",
@@ -287,3 +295,4 @@ async function getTransactionDetailByTransactionId(id) {
 }
 
 module.exports.getTransactionById = getTransactionById;
+module.exports.getTransactionAndTransactionDetailById = getTransactionAndTransactionDetailById
