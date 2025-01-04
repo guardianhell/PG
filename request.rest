@@ -218,6 +218,18 @@ Content-Type: application/json
     "TxnAmount" : "10000"
 }
 
+
+###
+ 
+ POST http://localhost:8081/api-v1/payment/rePaymentRequest
+ Content-Type: application/json
+
+{
+    "trx_id" : "88"
+}
+
+
+
 #  {
 #       "partnerReferenceNo": "20201029000001",
 #       "amount": {
@@ -278,6 +290,9 @@ Content-Type: application/json
 ###
 
 
+
+
+
  POST http://localhost:8081/api-v1/payment-type/create
  Content-Type: application/json
 
@@ -295,12 +310,7 @@ Content-Type: application/json
 
 
 
-###
-GET http://localhost:8081/api-v1/payment/rePaymentRequest
-Content-Type:  application/json
-{
-    "trx_id" : 88
-}
+
 
 ###
 

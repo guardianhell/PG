@@ -32,6 +32,7 @@ exports.requestNewPayment = async function (req, res) {
 exports.repaymentRequest = async function (req, res) {
   try {
 
+
     const paymentRequestHistoryData = await getPaymentDataByTrxId(req.trx_id).then((res) => {
       return res
     }).catch((error) => {
@@ -40,7 +41,50 @@ exports.repaymentRequest = async function (req, res) {
     })
 
 
-    console.log(paymentRequestHistoryData);
+    if (paymentRequestHistoryData.length === 0) {
+      return res.status(400).send("Transaction is not valid")
+    }
+
+    if (paymentRequestHistoryData[0].expire_date > moment().valueOf()) {
+      //Return Payment History Data
+      return res.status(200).send(paymentRequestHistoryData)
+    } else {
+      console.log("CREATING NEW PAYMENT");
+
+      const pgdata = {
+        ReferenceNo: paymentRequestHistoryData[0].trx_number,
+        TxnAmount: paymentRequestHistoryData[0].amount + "00",
+        ProdDesc: paymentRequestHistoryData[0].description,
+        user_id: req.user.id
+      }
+      //generate new payment request to PG
+      pgResponse = await generateQRISE2Pay(pgdata)
+
+      if (pgRespond.Code != "00") {
+        return res.status(400).send(pgRespond)
+      }
+
+
+      const dataPayment = {
+        id: paymentRequestHistoryData[0].id,
+        payment_number: pgRespond.TransId,
+        payment_link: pgRespond.Data.QRCode,
+        payment_vendor: paymentRequest.inquiry_id,
+        expire_date: pgRespond.Data.ExpireDate,
+      }
+
+      //Update to DB
+
+      const paymentUpdate = await updatePaymentRequest(dataPayment)
+
+      if (paymentUpdate.status == 417) {
+        return res.status(417).send(paymentUpdate)
+      }
+
+      res.status(200).send(paymentUpdate)
+
+    }
+
 
 
   } catch (error) {
@@ -48,6 +92,41 @@ exports.repaymentRequest = async function (req, res) {
     return res.status(500).send(error.message)
 
   }
+}
+
+
+async function updatePaymentRequest(data) {
+
+  const client = await db.pool.connect()
+
+  await client.query('BEGIN')
+
+  let updated_at = moment().valueOf();
+
+  const response = await client.query({ text: "UPDATE payment_request SET payment_number = $1, payment_link = $2, payment_vendor_identifier = $3, expire_date = $4,updated_at = $5 WHERE id = $6", values: [data.payment_number, data.payment_link, data.payment_vendor, data.expire_date, updated_at, data.id] }).then(async (res) => {
+
+    await client.query('COMMIT')
+
+    const data = {
+      status: 200,
+      message: "Success",
+      result: res.rows
+    }
+    return data
+  }).catch(async (error) => {
+    console.log(error)
+    await client.query('ROLLBACK')
+    data = {
+      status: 417,
+      message: "Error",
+      result: error.message
+    }
+    return error.message;
+  })
+
+  await client.release()
+  return response
+
 }
 
 async function createNewPaymentRequest(data) {
@@ -116,6 +195,7 @@ async function createNewPaymentRequest(data) {
   return response
 
 }
+
 
 
 exports.getPaymentByPaymentNumber = async function (req, res) {
@@ -261,7 +341,7 @@ async function getPaymentByPaymentNumber(paymentNumber) {
 
 async function getPaymentDataByTrxId(trxId) {
   const result = await db.pool.query({
-    text: "SELECT payment_request.id, invoice_id, payment_request_number, status, amount, payment_method_id, payment_number, payment_link, expire_date, payment_request.created_at, payment_request.payment_vendor_identifier FROM payment_request INNER JOIN invoices ON payment_request.invoice_id = invoices.id INNER JOIN transaction ON invoices.trx_id = transaction.id WHERE transaction.id = $1",
+    text: "SELECT payment_request.id, invoice_id, payment_request_number, payment_request.status, payment_request.amount, payment_method_id, payment_number, payment_link, expire_date, payment_request.created_at, payment_request.payment_vendor_identifier,transaction.trx_number, transaction_detail.description FROM payment_request INNER JOIN invoices ON payment_request.invoice_id = invoices.id INNER JOIN transaction ON invoices.trx_id = transaction.id INNER JOIN transaction_detail ON transaction.id = transaction_detail.trx_id WHERE transaction.id = $1",
     values: [trxId]
   })
   return result.rows
