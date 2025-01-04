@@ -39,9 +39,10 @@ exports.repaymentRequest = async function (req, res) {
       console.log(error);
       res.status(400).send(error.message)
     })
+    console.log(paymentRequestHistoryData);
 
 
-    if (paymentRequestHistoryData.length === 0) {
+    if (paymentRequestHistoryData.length == 0) {
       return res.status(400).send("Transaction is not valid")
     }
 
