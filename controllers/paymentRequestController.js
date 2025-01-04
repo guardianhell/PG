@@ -557,7 +557,7 @@ async function generateQRISE2Pay(dataBody) {
   }).catch((error) => {
     console.log("ERRROS");
 
-    //console.error(error)
+    console.error(error)
     const errorData = {
       Code: "500",
       message: error.message
