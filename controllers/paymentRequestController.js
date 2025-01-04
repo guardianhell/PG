@@ -32,10 +32,10 @@ exports.requestNewPayment = async function (req, res) {
 exports.repaymentRequest = async function (req, res) {
   try {
 
-    console.log(req.trx_id);
+    console.log(req.body.trx_id);
 
 
-    const paymentRequestHistoryData = await getPaymentDataByTrxId(req.trx_id).then((res) => {
+    const paymentRequestHistoryData = await getPaymentDataByTrxId(req.body.trx_id).then((res) => {
       return res
     }).catch((error) => {
       console.log(error);
