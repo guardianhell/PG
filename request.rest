@@ -296,5 +296,15 @@ Content-Type: application/json
 
 
 ###
+GET http://localhost:8081/api-v1/payment/rePaymentRequest
+Content-Type:  application/json
+{
+    "trx_id" : 88
+}
+
+###
+
+
+###
 
 
