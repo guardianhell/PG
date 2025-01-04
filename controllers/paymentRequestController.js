@@ -75,9 +75,14 @@ exports.repaymentRequest = async function (req, res) {
 
         const pgRespond = await generateQRISE2Pay(pgdata)
 
+        console.log(pgRespond);
+
         if (pgRespond.Code != "00") {
           return res.status(400).send(pgRespond)
         }
+
+
+
 
         const dataPayment = {
           id: paymentRequestHistoryData[0].id,
@@ -126,7 +131,7 @@ exports.repaymentRequest = async function (req, res) {
         ProdDesc: transactionData[0].description,
         user_id: req.user.id
       }
-      console.log("CREATING NEW PAYMENT");
+      console.log("CREATING NEW PAYMENT 2");
       const pgRespond = await generateQRISE2Pay(pgdata)
 
       if (pgRespond.Code != "00") {
