@@ -187,8 +187,7 @@ exports.createNewTransactionValidation = function (data) {
   const schema = Joi.object({
     user_id: Joi.number().min(1).max(9999).positive().integer().required(),
     total_amount: Joi.number().min(1).max(9999999999).required(),
-    product: Joi.array()
-      .items({
+    product: Joi.items({
         product_variaty_id: Joi.number()
           .min(1)
           .max(9999)
