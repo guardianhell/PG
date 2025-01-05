@@ -250,7 +250,7 @@ async function createNewPaymentRequest(data, client) {
       created_at,
       updated_at,
     ],
-  }).then(async (result) => {
+  }).then((result) => {
     console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(result));
 
     var data = {}
@@ -262,6 +262,8 @@ async function createNewPaymentRequest(data, client) {
         message: "success",
         result: result.rows
       }
+      console.log("SENDING DATA : " + JSON.stringify(data));
+
     }
     else {
       // await client.query('ROLLBACK')
@@ -269,6 +271,7 @@ async function createNewPaymentRequest(data, client) {
         status: 417,
         message: result.error
       }
+      console.log("SENDING DATA : " + JSON.stringify(data));
     }
 
     // await client.release()
