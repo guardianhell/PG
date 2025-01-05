@@ -10,7 +10,7 @@ const general = require("../general");
 const transactionController = require("../controllers/transactionController");
 
 
-async function createNewInvoiceFunction(data) {
+async function createNewInvoiceFunction(data, client) {
 
   const valid = await validation.createNewInvoiceValidation(data);
 
