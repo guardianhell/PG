@@ -37,16 +37,16 @@ async function createNewInvoiceFunction(data) {
     return response
   }
 
-  const trx = await transactionController.getTransactionById(data.trx_id);
+  // const trx = await transactionController.getTransactionById(data.trx_id);
 
-  if (trx.length == 0) {
-    response = {
-      status: 417,
-      message: 'Error',
-      result: "Invalid Transaction"
-    }
-    return response
-  }
+  // if (trx.length == 0) {
+  //   response = {
+  //     status: 417,
+  //     message: 'Error',
+  //     result: "Invalid Transaction"
+  //   }
+  //   return response
+  // }
 
   const currency = await currencyController.getCurrencyByName(
     data.currency_name
