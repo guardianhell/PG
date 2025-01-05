@@ -79,9 +79,10 @@ async function createNewInvoiceFunction(data) {
 
   const status = 1;
 
-  const client = await db.pool.connect()
+  // const client = await db.pool.connect()
 
-  await client.query('BEGIN')
+  // await client.query('BEGIN')
+
 
   const responseQuery = await client.query(
     {
@@ -89,7 +90,7 @@ async function createNewInvoiceFunction(data) {
       values: [
         invoiceNumber,
         data.trx_id,
-        trx[0].total_amount,
+        data.total_amount,
         currency[0].id,
         status,
         created_at,
@@ -100,21 +101,21 @@ async function createNewInvoiceFunction(data) {
     var response = {}
 
     if (!result.error) {
-      await client.query('COMMIT')
+      // await client.query('COMMIT')
       response = {
         status: 200,
         message: 'success',
         result: result.rows
       }
     } else {
-      await client.query('ROLLBACK')
+      // await client.query('ROLLBACK')
       data = {
         status: 417,
         message: 'Error',
         result: result.error
       }
     }
-    await client.release()
+    // await client.release()
     return response
 
   });
