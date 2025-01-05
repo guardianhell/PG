@@ -339,7 +339,7 @@ exports.createNewTransaction2 = async function (req, res) {
         const invoiceData = {
           trx_id: resultTransaction.rows[0].id,
           currency_name: 'Rupiah',
-          amount: resultTransaction.rows[0].total_amount
+          amount: resultTransaction.rows[0].amount
         }
         console.log("WRITING INVOICE");
 
