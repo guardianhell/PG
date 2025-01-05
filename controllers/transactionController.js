@@ -359,7 +359,13 @@ exports.createNewTransaction2 = async function (req, res) {
             return res.status(resultInvoice.status).send(resultInvoice.message)
           }
 
-          const product = await productController.getProductById(productVariaty.product_id)
+          console.log();
+
+
+          const product = await productVariatyController.getProductVariatyById(productVariaty.product_id)
+
+          console.log("PRODUCT : " + JSON.stringify(product));
+
 
           //Creating Request Inquiry to UNPL
           console.log("REQUESTING PAYMENT TO UNPL");
