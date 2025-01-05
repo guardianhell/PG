@@ -12,6 +12,9 @@ const transactionController = require("../controllers/transactionController");
 
 async function createNewInvoiceFunction(data, client) {
 
+  console.log("INCOMING : " + JSON.stringify(data));
+
+
   const valid = await validation.createNewInvoiceValidation(data);
 
   var response = {}
