@@ -384,7 +384,7 @@ exports.createNewTransaction2 = async function (req, res) {
           const pgdata = {
             ReferenceNo: trx_number,
             TxnAmount: manipulationTotalAmount,
-            ProdDesc: productVariaty.variaty_name,
+            ProdDesc: validProduct[0].variaty_name,
             user_id: req.user.id
           }
 
