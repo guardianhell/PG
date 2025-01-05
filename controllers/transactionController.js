@@ -423,9 +423,9 @@ exports.createNewTransaction2 = async function (req, res) {
               return res.status(417).send(paymentRequestResult.message)
             }
 
-            await client.query('COMMIT')
 
-            return res.status(200).send(paymentRequestResult)
+
+            return resultPaymentRequest
 
           }).catch(async (error) => {
 
@@ -438,6 +438,8 @@ exports.createNewTransaction2 = async function (req, res) {
             return data
           })
 
+          return invoice
+
         }).catch(async (error) => {
 
           await client.query('ROLLBACK')
@@ -448,6 +450,8 @@ exports.createNewTransaction2 = async function (req, res) {
           }
           return data
         })
+
+        return transactionDetail
 
 
       }).catch(async (error) => {
@@ -461,6 +465,8 @@ exports.createNewTransaction2 = async function (req, res) {
         return data
       })
 
+      return transaction
+
     }).catch(async (error) => {
 
       await client.query('ROLLBACK')
@@ -472,6 +478,8 @@ exports.createNewTransaction2 = async function (req, res) {
       return data
     })
 
+
+    await client.query('COMMIT')
     await client.release()
 
   } catch (error) {
