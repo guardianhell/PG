@@ -316,7 +316,7 @@ exports.createNewTransaction2 = async function (req, res) {
       console.log("TRX RESULT" + JSON.stringify(resultTransaction));
 
       // Saving TRX Detail to DB
-      const price = validProduct.price;
+      const price = validProduct[0].price;
       const amount = price * 1;
 
       console.log("WRITING TRX DETAIL");
