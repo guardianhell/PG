@@ -276,7 +276,7 @@ exports.createNewTransaction2 = async function (req, res) {
       return res.status(417).send("Invalid product variaty");
     }
 
-    total_amount = validProduct.price;
+    total_amount = validProduct[0].price;
 
     console.log("VALIDATING TOTAL AMOUNT");
     console.log("TOTAL AMOUNT : " + total_amount);
