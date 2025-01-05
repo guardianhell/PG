@@ -430,46 +430,46 @@ exports.createNewTransaction2 = async function (req, res) {
           }).catch(async (error) => {
 
             await client.query('ROLLBACK')
-            const error = {
+            const data = {
               status: 500,
               message: error,
               result: error.message
             }
-            return error
+            return data
           })
 
         }).catch(async (error) => {
 
           await client.query('ROLLBACK')
-          const error = {
+          const data = {
             status: 500,
             message: error,
             result: error.message
           }
-          return error
+          return data
         })
 
 
       }).catch(async (error) => {
 
         await client.query('ROLLBACK')
-        const error = {
+        const data = {
           status: 500,
           message: error,
           result: error.message
         }
-        return error
+        return data
       })
 
     }).catch(async (error) => {
 
       await client.query('ROLLBACK')
-      const error = {
+      const data = {
         status: 500,
         message: error,
         result: error.message
       }
-      return error
+      return data
     })
 
     await client.release()
