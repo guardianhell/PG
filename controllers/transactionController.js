@@ -232,7 +232,7 @@ exports.createNewTransaction2 = async function (req, res) {
 
     const valid = await validation.createNewTransactionValidation(req.body);
 
-    console.log("validation : " + valid);
+    console.log("validation : " + JSON.stringify(valid));
 
 
     if (valid.error) {
