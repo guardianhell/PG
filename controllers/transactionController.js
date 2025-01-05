@@ -478,7 +478,12 @@ exports.createNewTransaction2 = async function (req, res) {
       return data
     })
 
+    console.log("FINAL TRX  : " + JSON.stringify(transaction));
 
+
+    if (transaction.Code == 500) {
+      return res.status(500).send(transaction.message)
+    }
 
     console.log("COMMITING DB");
 
