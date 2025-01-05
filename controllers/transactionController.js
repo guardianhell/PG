@@ -343,7 +343,7 @@ exports.createNewTransaction2 = async function (req, res) {
         }
         console.log("WRITING INVOICE");
 
-        const invoice = await invoiceController.createNewInvoiceFunction(invoiceData).then(async (resultInvoice) => {
+        const invoice = await invoiceController.createNewInvoiceFunction(invoiceData, client).then(async (resultInvoice) => {
 
           console.log("INVOICE RESULT " + JSON.stringify(resultInvoice));
 
