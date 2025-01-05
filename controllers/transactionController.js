@@ -279,6 +279,10 @@ exports.createNewTransaction2 = async function (req, res) {
     total_amount = validProduct.price;
 
     console.log("VALIDATING TOTAL AMOUNT");
+    console.log("TOTAL AMOUNT : " + total_amount);
+    console.log("REQ TOTAL AMOUNT : " + req.body.total_amount);
+
+
 
 
 
