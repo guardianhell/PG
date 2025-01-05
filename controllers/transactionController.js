@@ -227,13 +227,22 @@ exports.createNewTransaction = async function (req, res) {
 
 exports.createNewTransaction2 = async function (req, res) {
   try {
+
+    console.log("Transaction create is in Process");
+
     const valid = await validation.createNewTransactionValidation(req.body);
+
+    console.log("validation : " + valid);
+
 
     if (valid.error) {
       return res.status(417).send(valid.error);
     }
 
     statusId = await statusController.getStatusByName("Waiting for Payment");
+
+    console.log("STATUS FETCH : " + statusId);
+
 
     if (statusId.length == 0) {
       return res.status(417).send("Invalid Status");
