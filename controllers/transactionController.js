@@ -438,7 +438,7 @@ exports.createNewTransaction2 = async function (req, res) {
             return data
           })
 
-          return invoice
+          return paymentRequestResult
 
         }).catch(async (error) => {
 
@@ -451,7 +451,7 @@ exports.createNewTransaction2 = async function (req, res) {
           return data
         })
 
-        return transactionDetail
+        return invoice
 
 
       }).catch(async (error) => {
@@ -465,7 +465,7 @@ exports.createNewTransaction2 = async function (req, res) {
         return data
       })
 
-      return transaction
+      return transactionDetail
 
     }).catch(async (error) => {
 
@@ -479,8 +479,15 @@ exports.createNewTransaction2 = async function (req, res) {
     })
 
 
+
+    console.log("COMMITING DB");
+
+
+
     await client.query('COMMIT')
     await client.release()
+
+    return res.status(200).send(transaction)
 
   } catch (error) {
     console.log(error);
