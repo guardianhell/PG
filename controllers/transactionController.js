@@ -333,7 +333,7 @@ exports.createNewTransaction2 = async function (req, res) {
         ]
       }).then(async (resultTransactionDetail) => {
 
-        console.log("TRX DETAIL : " + JSON.stringify(resultTransactionDetail));
+        console.log("TRX DETAIL : " + JSON.stringify(resultTransactionDetail.rows[0]));
 
         // Creating Invoice Data
         const invoiceData = {

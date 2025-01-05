@@ -90,7 +90,7 @@ async function createNewInvoiceFunction(data, client) {
       values: [
         invoiceNumber,
         data.trx_id,
-        data.total_amount,
+        data.amount,
         currency[0].id,
         status,
         created_at,
