@@ -241,7 +241,7 @@ exports.createNewTransaction2 = async function (req, res) {
 
     statusId = await statusController.getStatusByName("Waiting for Payment");
 
-    console.log("STATUS FETCH : " + statusId);
+    console.log("STATUS FETCH : " + JSON.stringify(statusId));
 
 
     if (statusId.length == 0) {
@@ -268,6 +268,9 @@ exports.createNewTransaction2 = async function (req, res) {
       productVariaty.product_variaty_id
     );
 
+    console.log("validating product : " + JSON.stringify(validProduct));
+
+
 
     if (validProduct.length == 0) {
       return res.status(417).send("Invalid product variaty");
@@ -275,13 +278,20 @@ exports.createNewTransaction2 = async function (req, res) {
 
     total_amount = validProduct.price;
 
+    console.log("VALIDATING TOTAL AMOUNT");
+
 
 
     if (total_amount != req.body.total_amount) {
       return res.status(417).send("Invalid Total Amount");
     }
 
+    console.log("TOTAL AMOUNT VALIDATED");
+
+
     const manipulationTotalAmount = req.body.total_amount + "00"
+
+    console.log("WRITING TRX TO DB");
 
     const client = await db.pool.connect()
 
@@ -299,9 +309,13 @@ exports.createNewTransaction2 = async function (req, res) {
         updated_at,
       ],
     }).then(async (resultTransaction) => {
+      console.log("TRX RESULT" + JSON.stringify(resultTransaction));
+
       // Saving TRX Detail to DB
       const price = validProduct.price;
       const amount = price * 1;
+
+      console.log("WRITING TRX DETAIL");
 
       const transactionDetail = await client.query({
         text: "INSERT INTO transaction_detail(trx_id,product_variaty_id, description,amount,qty,price) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
@@ -314,14 +328,21 @@ exports.createNewTransaction2 = async function (req, res) {
           price
         ]
       }).then(async (resultTransactionDetail) => {
+
+        console.log("TRX DETAIL : " + resultTransactionDetail);
+
         // Creating Invoice Data
         const invoiceData = {
           trx_id: resultTransaction.rows[0].id,
           currency_name: 'Rupiah',
           amount: resultTransaction.rows[0].total_amount
         }
+        console.log("WRITING INVOICE");
 
         const invoice = await invoiceController.createNewInvoiceFunction(invoiceData).then(async (resultInvoice) => {
+
+          console.log("INVOICE RESULT " + JSON.stringify(resultInvoice));
+
           if (resultInvoice.status == 417) {
             return res.status(resultInvoice.status).send(resultInvoice.message)
           }
@@ -329,8 +350,12 @@ exports.createNewTransaction2 = async function (req, res) {
           const product = await productController.getProductById(productVariaty.product_id)
 
           //Creating Request Inquiry to UNPL
+          console.log("REQUESTING PAYMENT TO UNPL");
 
           const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
+
+          console.log("PAYMENT REQUEST TO UNPL : " + JSON.stringify(paymentRequest));
+
 
           if (paymentRequest.Code === "500") {
             return res.status(500).send(paymentRequest.message)
@@ -345,9 +370,12 @@ exports.createNewTransaction2 = async function (req, res) {
             user_id: req.user.id
           }
 
+          console.log("REQUEST TO PG");
+
+
           const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
-          console.log(pgRespond);
+          console.log("PG RESPONSE : " + JSON.stringify(pgRespond));
 
           if (pgRespond.Code != "00") {
             return res.status(400).send(pgRespond)
@@ -366,7 +394,12 @@ exports.createNewTransaction2 = async function (req, res) {
 
           //SAVING Payment Request to DB
 
+          console.log("WRITING TO DB");
+
+
           const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment).then((resultPaymentRequest) => {
+
+            console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(paymentRequestResult));
 
             if (resultPaymentRequest.status === 417) {
               return res.status(417).send(paymentRequestResult.message)
@@ -382,163 +415,6 @@ exports.createNewTransaction2 = async function (req, res) {
 
     })
 
-    await client.query(
-      {
-        text: "INSERT INTO transaction(trx_number,user_id,total_amount,status,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
-        values: [
-          trx_number,
-          user_id,
-          req.body.total_amount,
-          statusId[0].id,
-          created_at,
-          updated_at,
-        ],
-      },
-      async (error, result) => {
-        if (error) {
-          return res.status(417).send(error.message);
-        }
-
-        var data = {}
-
-        for (var i = 0; i < array.length; i++) {
-          validProduct = await productVariatyController.getProductVariatyById(
-            array[i].product_variaty_id
-          );
-
-          const price = validProduct[0].price;
-          const amount = price * array[i].qty;
-
-          await client.query({
-            text: "INSERT INTO transaction_detail(trx_id,product_variaty_id, description,amount,qty,price) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
-            values: [
-              result.rows[0].id,
-              array[i].product_variaty_id,
-              validProduct[0].variaty_name,
-              amount,
-              array[i].qty,
-              price
-            ],
-          }).then((result) => {
-
-            if (!result.error) {
-              data = {
-                status: 200,
-                message: "success",
-                result: result.rows
-              }
-
-            } else {
-              client.query('ROLLBACK')
-              data = {
-                status: 417,
-                message: "Error",
-                result: result.error
-              }
-              return res.status(data.status).send(data.message)
-            }
-          });
-        }
-
-        await client.query('COMMIT')
-        await client.release()
-
-        //create invoice
-
-        const invoiceData = {
-          trx_id: result.rows[0].id,
-          currency_name: 'Rupiah',
-          amount: result.rows[0].total_amount
-        }
-
-        const response = await invoiceController.createNewInvoiceFunction(invoiceData)
-
-        console.log(response);
-
-
-        if (response.status === 417) {
-          return res.status(response.status).send(response.message)
-        }
-
-        // console.log("INVOICEEEEE" + JSON.stringify(response.result[0]));
-
-
-        // console.log(result.rows[0].id);
-
-        const trx_detail = await getTransactionDetailByTransactionId(invoiceData.trx_id)
-
-        // console.log(trx_detail);
-
-        const productVariaty = await productVariatyController.getProductVariatyById(trx_detail[0].product_variaty_id)
-
-        const product = await productController.getProductById(productVariaty[0].product_id)
-
-        //get inqury to merchant
-        const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
-
-        if (paymentRequest.Code === "500") {
-          return res.status(500).send(paymentRequest.message)
-        }
-
-        console.log(paymentRequest);
-
-
-        const pgdata = {
-          ReferenceNo: trx_number,
-          TxnAmount: manipulationTotalAmount,
-          ProdDesc: productVariaty[0].variaty_name,
-          user_id: req.user.id
-        }
-
-
-        //MUST GENERATE to PG REquest
-        const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
-
-        console.log(pgRespond);
-
-        // const validSignature = await paymentRequestController.validateSignature(pgRespond)
-
-        // if (!validSignature) {
-        //   return res.status(400).send("Invalid Response")
-        // }
-
-
-
-
-        if (pgRespond.Code != "00") {
-          return res.status(400).send(pgRespond)
-        }
-
-
-        const dataPayment = {
-          invoice_id: response.result[0].id,
-          amount: response.result[0].amount,
-          payment_method_id: 1,
-          payment_number: pgRespond.TransId,
-          payment_link: pgRespond.Data.QRCode,
-          payment_vendor: paymentRequest.inquiry_id,
-          expire_date: pgRespond.Data.ExpireDate,
-        }
-
-
-
-        //Saving Payment Gateway Responses to DB
-        const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
-
-
-
-
-
-        if (paymentRequestResult.status === 417) {
-          return res.status(417).send(paymentRequestResult.message)
-        }
-
-
-        console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
-
-        return res.status(200).send(paymentRequestResult)
-      }
-    );
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message);
