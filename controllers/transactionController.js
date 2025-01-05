@@ -362,7 +362,7 @@ exports.createNewTransaction2 = async function (req, res) {
           console.log();
 
 
-          const product = await productVariatyController.getProductVariatyById(productVariaty.product_id)
+          const product = await productVariatyController.getProductVariatyById(productVariaty.product_variaty_id)
 
           console.log("PRODUCT : " + JSON.stringify(product));
 
