@@ -336,12 +336,15 @@ exports.createNewTransaction2 = async function (req, res) {
         console.log("TRX DETAIL : " + JSON.stringify(resultTransactionDetail.rows[0]));
 
 
+        console.log("AMOUNT SENDING : " + resultTransaction.rows[0].amount);
+
 
         // Creating Invoice Data
         const invoiceData = {
           trx_id: resultTransaction.rows[0].id,
+          amount: resultTransaction.rows[0].amount,
           currency_name: 'Rupiah',
-          amount: resultTransaction.rows[0].amount
+
         }
 
         console.log("SENDING DATA : " + JSON.stringify(invoiceData));
