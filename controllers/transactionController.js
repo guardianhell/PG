@@ -415,23 +415,64 @@ exports.createNewTransaction2 = async function (req, res) {
           console.log("WRITING TO DB");
 
 
-          const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment).then((resultPaymentRequest) => {
+          const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment, client).then(async (resultPaymentRequest) => {
 
             console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(paymentRequestResult));
 
-            if (resultPaymentRequest.status === 417) {
+            if (resultPaymentRequest.status == 417) {
               return res.status(417).send(paymentRequestResult.message)
             }
 
+            await client.query('COMMIT')
+
             return res.status(200).send(paymentRequestResult)
 
+          }).catch(async (error) => {
+
+            await client.query('ROLLBACK')
+            const error = {
+              status: 500,
+              message: error,
+              result: error.message
+            }
+            return error
           })
 
+        }).catch(async (error) => {
+
+          await client.query('ROLLBACK')
+          const error = {
+            status: 500,
+            message: error,
+            result: error.message
+          }
+          return error
         })
 
+
+      }).catch(async (error) => {
+
+        await client.query('ROLLBACK')
+        const error = {
+          status: 500,
+          message: error,
+          result: error.message
+        }
+        return error
       })
 
+    }).catch(async (error) => {
+
+      await client.query('ROLLBACK')
+      const error = {
+        status: 500,
+        message: error,
+        result: error.message
+      }
+      return error
     })
+
+    await client.release()
 
   } catch (error) {
     console.log(error);
