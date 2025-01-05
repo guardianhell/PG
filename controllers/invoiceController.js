@@ -83,6 +83,9 @@ async function createNewInvoiceFunction(data, client) {
 
   // await client.query('BEGIN')
 
+  console.log("PRE DATA INVOICE : " + data);
+
+
 
   const responseQuery = await client.query(
     {
