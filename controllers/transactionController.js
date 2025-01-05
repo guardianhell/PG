@@ -370,7 +370,7 @@ exports.createNewTransaction2 = async function (req, res) {
           //Creating Request Inquiry to UNPL
           console.log("REQUESTING PAYMENT TO UNPL");
 
-          const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, productVariaty[0].variaty_ref_number)
+          const paymentRequest = await productController.paymentRequestUniplay(product[0].product_ref_number, validProduct[0].variaty_ref_number)
 
           console.log("PAYMENT REQUEST TO UNPL : " + JSON.stringify(paymentRequest));
 
