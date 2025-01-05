@@ -326,7 +326,7 @@ exports.createNewTransaction2 = async function (req, res) {
         values: [
           resultTransaction.rows[0].id,
           productVariaty.product_variaty_id,
-          validProduct.variaty_name,
+          validProduct[0].variaty_name,
           amount,
           productVariaty.qty,
           price
