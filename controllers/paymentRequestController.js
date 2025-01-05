@@ -209,11 +209,16 @@ async function updatePaymentRequest(data) {
 
 }
 
-async function createNewPaymentRequest(data) {
+async function createNewPaymentRequest(data, client) {
 
   const valid = await validation.requestNewPaymentValidation(data)
 
+  console.log("VALIDATION PAYMENT REQUEST INPUT : " + JSON.stringify(valid));
+
+
   if (valid.error) {
+    console.log(valid.error);
+
     const error = {
       status: 417,
       message: valid.error
@@ -224,14 +229,11 @@ async function createNewPaymentRequest(data) {
   let created_at = moment().valueOf();
   let updated_at = moment().valueOf();
 
-  const client = await db.pool.connect()
+  // const client = await db.pool.connect()
 
-  await client.query("BEGIN")
+  // await client.query("BEGIN")
 
   const paymentNumber = await generatePaymentNumber(created_at)
-
-  console.log(paymentNumber);
-
 
   const response = await client.query({
     text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor_identifier,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
@@ -249,10 +251,12 @@ async function createNewPaymentRequest(data) {
       updated_at,
     ],
   }).then(async (result) => {
+    console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(result));
+
     var data = {}
 
     if (!result.error) {
-      await client.query('COMMIT')
+      // await client.query('COMMIT')
       data = {
         status: 200,
         message: "success",
@@ -260,14 +264,14 @@ async function createNewPaymentRequest(data) {
       }
     }
     else {
-      await client.query('ROLLBACK')
+      // await client.query('ROLLBACK')
       data = {
         status: 417,
         message: result.error
       }
     }
 
-    await client.release()
+    // await client.release()
     return data
 
   })
