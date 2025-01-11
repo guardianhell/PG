@@ -420,7 +420,12 @@ exports.createNewTransaction2 = async function (req, res) {
             console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(resultPaymentRequest));
 
             if (resultPaymentRequest.status == 417) {
-              return res.status(417).send(resultPaymentRequest.message)
+              const error = {
+                status: 417,
+                message: "Error",
+                result: resultPaymentRequest.message
+              }
+              return error
             }
 
             return resultPaymentRequest
