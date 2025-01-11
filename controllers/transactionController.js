@@ -417,11 +417,13 @@ exports.createNewTransaction2 = async function (req, res) {
 
           const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment, client).then(async (resultPaymentRequest) => {
 
-            console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(paymentRequestResult));
+            console.log("PAYMENT REQUEST RESULT : " + JSON.stringify(resultPaymentRequest));
 
             if (resultPaymentRequest.status == 417) {
-              return res.status(417).send(paymentRequestResult.message)
+              return res.status(417).send(resultPaymentRequest.message)
             }
+
+            return resultPaymentRequest
 
           }).catch(async (error) => {
 
