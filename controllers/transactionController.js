@@ -423,10 +423,6 @@ exports.createNewTransaction2 = async function (req, res) {
               return res.status(417).send(paymentRequestResult.message)
             }
 
-
-
-            return resultPaymentRequest
-
           }).catch(async (error) => {
 
             await client.query('ROLLBACK')
@@ -486,6 +482,9 @@ exports.createNewTransaction2 = async function (req, res) {
     }
 
     console.log("COMMITING DB");
+
+    console.log("FINAL RESULT : " + JSON.stringify(transaction));
+
 
 
 
