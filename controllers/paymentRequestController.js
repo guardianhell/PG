@@ -527,13 +527,17 @@ async function generateQRISE2Pay(dataBody) {
   console.log(signature);
   console.log(process.env.MERCHANTKEY);
 
-  const user = await db.pool.query({ text: "SELECT * FROM users WHERE id = $1", values: [dataBody.user_id] })
+  // const user = await db.pool.query({ text: "SELECT * FROM users WHERE id = $1", values: [dataBody.user_id] })
 
-  const userData = user.rows[0]
+  // const userData = user.rows[0]
 
-  const userName = userData.first_name + " " + userData.last_name
+  // const userName = userData.first_name + " " + userData.last_name
 
-  const userEmail = userData.email
+  // const userEmail = userData.email
+
+  const userName = "USER TEST"
+
+  const userEmail = "userData@email.com"
 
 
   const data = {
