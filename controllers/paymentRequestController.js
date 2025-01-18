@@ -535,6 +535,8 @@ async function generateQRISE2Pay(dataBody) {
 
   // const userEmail = userData.email
 
+  const ProdDesc = "TEST ITEM"
+
   const userName = "USER TEST"
 
   const userEmail = "userData@email.com"
@@ -546,7 +548,7 @@ async function generateQRISE2Pay(dataBody) {
     "RefNo": dataBody.ReferenceNo,
     "Amount": dataBody.TxnAmount,
     "Currency": "IDR",
-    "ProdDesc": dataBody.ProdDesc,
+    "ProdDesc": ProdDesc,
     "UserName": userName,
     "UserEmail": userEmail,
     "UserContact": "08100000000",
