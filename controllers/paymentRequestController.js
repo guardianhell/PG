@@ -158,10 +158,12 @@ exports.repaymentRequest = async function (req, res) {
 
 
       if (paymentRequestResult.status === 417) {
-
+        await client.query('ROLLBACK')
+        await client.release()
         return res.status(417).send(paymentRequestResult.message)
       } 
-
+      await client.query("COMMIT")
+      await client.release()
       console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
       return res.status(200).send(paymentRequestResult)
@@ -347,8 +349,6 @@ exports.checkPaymentStatus = async function (req, res) {
     console.log(response);
 
     return res.status(200).send(response.data)
-
-
 
 
   } catch (error) {
