@@ -312,7 +312,7 @@ exports.checkPaymentStatus = async function (req, res) {
     console.log(req.body);
 
 
-    const transactionDetail = await getPaymentDataByInvoiceId(req.body.invoice_id)
+    const transactionDetail = await getPaymentDataByInvoiceId(req.body.result[0].invoice_id)
 
     console.log(JSON.stringify(transactionDetail));
 
