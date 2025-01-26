@@ -327,7 +327,7 @@ exports.checkPaymentStatus = async function (req, res) {
 
     const signature = await crypto.createHash("sha1").update(
       merchantKey + merchantCode + paymentId + refNo + transId + "IDR"
-    )
+    ).digest("base64")
 
     const data = {
       PaymentId: paymentId,
