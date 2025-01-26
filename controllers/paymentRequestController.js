@@ -316,19 +316,27 @@ exports.checkPaymentStatus = async function (req, res) {
 
     console.log(JSON.stringify(transactionDetail));
 
-    return
     const url = process.url.URLE2PAY
     const merchantCode = process.env.MERCHANTCODE
     const merchantKey = process.env.MERCHANTKEY;
-    const paymentId = req.body.PaymentId
-    const refNo = req.body.RefNo
-    const transId = req.body.TransId
+    const paymentId = "37"
+    const refNo = transactionDetail[0].trx_number
+    const transId = transactionDetail[0].payment_number
 
 
 
     const signature = await crypto.createHash("sha1").update(
       merchantKey + merchantCode + paymentId + refNo + transId + "IDR"
     )
+
+    const data = {
+      PaymentId: paymentId,
+      MerchantCode: merchantCode,
+      Currency: "IDR",
+      TransId: transId,
+      RefNo: refNo,
+      Signature: signature
+    }
 
     const response = await axios.post(url, data, {
       headers: {
