@@ -316,7 +316,7 @@ exports.checkPaymentStatus = async function (req, res) {
 
     console.log(JSON.stringify(transactionDetail));
 
-    const url = process.env.URLE2PAYREQUERY
+    const url = "https://api-uat.e2pay.co.id/RMS/nms/requery_bridge.php"
     const merchantCode = process.env.MERCHANTCODE
     const merchantKey = process.env.MERCHANTKEY;
     const paymentId = 21
