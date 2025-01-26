@@ -151,12 +151,12 @@ exports.repaymentRequest = async function (req, res) {
         expire_date: pgRespond.Data.ExpireDate,
       }
 
-      const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment)
+      const paymentRequestResult = await createNewPaymentRequest(dataPayment)
 
 
       if (paymentRequestResult.status === 417) {
         return res.status(417).send(paymentRequestResult.message)
-      }
+      } z
 
       console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
