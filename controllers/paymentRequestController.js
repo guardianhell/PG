@@ -235,6 +235,12 @@ async function createNewPaymentRequest(data, client) {
 
   const paymentNumber = await generatePaymentNumber(created_at)
 
+  console.log("NEW PAYMENT NUMBER : " + paymentNumber);
+
+  console.log("DATA : " + data);
+
+
+
   const response = await client.query({
     text: "INSERT INTO payment_request(invoice_id,payment_request_number, status,amount, payment_method_id,payment_number,payment_link,expire_date,payment_vendor_identifier,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
     values: [
