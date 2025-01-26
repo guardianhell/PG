@@ -319,7 +319,7 @@ exports.checkPaymentStatus = async function (req, res) {
     const url = process.env.URLE2PAY
     const merchantCode = process.env.MERCHANTCODE
     const merchantKey = process.env.MERCHANTKEY;
-    const paymentId = "37"
+    const paymentId = 21
     const refNo = transactionDetail[0].trx_number
     const transId = transactionDetail[0].payment_number
 
