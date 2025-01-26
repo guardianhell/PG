@@ -346,6 +346,8 @@ exports.checkPaymentStatus = async function (req, res) {
 
     console.log(response);
 
+    return res.status(200).send(response.data)
+
 
 
 
