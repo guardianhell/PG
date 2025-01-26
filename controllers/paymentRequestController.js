@@ -151,12 +151,16 @@ exports.repaymentRequest = async function (req, res) {
         expire_date: pgRespond.Data.ExpireDate,
       }
 
-      const paymentRequestResult = await createNewPaymentRequest(dataPayment)
+      const client = await db.pool.connect()
+      await client.query('BEGIN')
+
+      const paymentRequestResult = await createNewPaymentRequest(dataPayment, client)
 
 
       if (paymentRequestResult.status === 417) {
+
         return res.status(417).send(paymentRequestResult.message)
-      } z
+      } 
 
       console.log("HIGHLIGHT : " + JSON.stringify(paymentRequestResult));
 
@@ -302,6 +306,44 @@ exports.getPaymentByPaymentNumber = async function (req, res) {
   }
 }
 
+exports.checkPaymentStatus = async function (req, res) {
+  try {
+
+    const transactionDetail = await getPaymentDataByInvoiceId(req.body.invoice_id)
+
+    console.log(JSON.stringify(transactionDetail));
+
+    return
+    const url = process.url.URLE2PAY
+    const merchantCode = process.env.MERCHANTCODE
+    const merchantKey = process.env.MERCHANTKEY;
+    const paymentId = req.body.PaymentId
+    const refNo = req.body.RefNo
+    const transId = req.body.TransId
+
+
+
+    const signature = await crypto.createHash("sha1").update(
+      merchantKey + merchantCode + paymentId + refNo + transId + "IDR"
+    )
+
+    const response = await axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    console.log(response);
+
+
+
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message)
+  }
+}
+
 exports.callbackURLPaymentConfirm = async function (req, res) {
   try {
 
@@ -440,6 +482,14 @@ async function getPaymentDataByTrxId(trxId) {
   return result.rows
 }
 
+async function getPaymentDataByInvoiceId(invoiceId) {
+  const result = await db.pool.query({
+    text: "SELECT payment_request.id, invoice_id, payment_request_number, payment_request.status, payment_request.amount, payment_method_id, payment_number, payment_link, expire_date, payment_request.created_at, payment_request.payment_vendor_identifier,transaction.trx_number, transaction_detail.description FROM payment_request INNER JOIN invoices ON payment_request.invoice_id = invoices.id INNER JOIN transaction ON invoices.trx_id = transaction.id INNER JOIN transaction_detail ON transaction.id = transaction_detail.trx_id WHERE invoices.id = $1",
+    values: [invoiceId]
+  })
+  return result.rows
+}
+
 async function validateSignature(data) {
 
 
@@ -516,7 +566,7 @@ async function settlementToVendorUPL(paymentId) {
 }
 
 async function generateQRISE2Pay(dataBody) {
-  const url = "https://pg-uat.e2pay.co.id/RMS/API/nms2us/direct_api_bridge.php";
+  const url = process.env.URLE2PAY;
   const merchantKey = process.env.MERCHANTKEY;
   const merchantCode = process.env.MERCHANTCODE;
   const signature = crypto
