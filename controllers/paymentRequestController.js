@@ -237,7 +237,7 @@ async function createNewPaymentRequest(data, client) {
 
   console.log("NEW PAYMENT NUMBER : " + paymentNumber);
 
-  console.log("DATA : " + data);
+  console.log("DATA : " + JSON.stringify(data));
 
 
 
