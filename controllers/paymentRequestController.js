@@ -515,7 +515,7 @@ async function validateSignature(data) {
   const merchantCode = process.env.MERCHANTCODE
   const paymentID = data.PaymentId
   const refNo = data.RefNo
-  const amount = data.Amount
+  const amount = data.Amount + "00"
   const currency = "IDR"
   const status = data.Status
   const responseSignature = data.Signature
