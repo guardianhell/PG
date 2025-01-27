@@ -533,8 +533,11 @@ async function validateSignature(data) {
 
   const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
 
+  const testSign = await crypto.createHash("sha1").update("cd61b35d5c497c01758be7c91e2d0b94EP001658_S00521TX-1737912203578-3061538100IDRPENDING").digest("base64")
+
   console.log("VALID SIGN : " + validSignature);
   console.log("RES SIGN : " + responseSignature);
+  console.log("TEST SIGN  : " + testSign)
 
 
 
