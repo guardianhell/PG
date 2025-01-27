@@ -513,13 +513,12 @@ async function validateSignature(data) {
 
   const merchantKey = process.env.MERCHANTKEY
   const merchantCode = process.env.MERCHANTCODE
-  const paymentID = data.PaymentId
+  const paymentID = 21
   const refNo = data.RefNo
   const amount = data.Amount + "00"
   const currency = "IDR"
   const status = data.Status
   const responseSignature = data.Signature
-  const transId = data.TransId
 
   console.log("MK : " + merchantKey);
   console.log("MC : " + merchantCode);
@@ -532,7 +531,7 @@ async function validateSignature(data) {
 
 
 
-  const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + transId + currency).digest("base64")
+  const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
 
   const testSign = await crypto.createHash("sha1").update("cd61b35d5c497c01758be7c91e2d0b94EP001658_S00521TX-1737912203578-3061538100IDRPENDING").digest("base64")
 
