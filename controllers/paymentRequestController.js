@@ -524,7 +524,7 @@ async function validateSignature(data) {
   console.log("MC : " + merchantCode);
   console.log("PID : " + paymentID);
   console.log("RN : " + refNo);
-  console.log("Amount : " + amount);
+  console.log("Amount : " + amount + "00");
   console.log("curr : " + currency)
   console.log("Status : " + status);
   console.log("RES SIGN DAT : " + responseSignature);
