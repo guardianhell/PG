@@ -346,6 +346,11 @@ exports.checkPaymentStatus = async function (req, res) {
       }
     })
 
+
+    validateSignature(response.data)
+
+
+
     console.log(response);
 
     return res.status(200).send(response.data)
@@ -526,11 +531,6 @@ async function validateSignature(data) {
 
 
 
-
-
-
-
-
   const validSignature = await crypto.createHash("sha1").update(merchantKey + merchantCode + paymentID + refNo + amount + currency + status).digest("base64")
 
   console.log("VALID SIGN : " + validSignature);
@@ -624,7 +624,7 @@ async function generateQRISE2Pay(dataBody) {
     "Remark": "PandoorBox - " + dataBody.ProdDesc,
     "Lang": "UTF-8",
     "Signature": signature,
-    "CallBackURL": "http://pandoorbox.com:" + process.env.PORT + "/api-v1/e2p/trx/callback/" + dataBody.ReferenceNo,
+    "CallBackURL": "http://pandoorbox.com:" + process.env.PORT + "/api-v1/e2p/trx/callback/"
   };
 
 
