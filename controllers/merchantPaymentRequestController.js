@@ -15,13 +15,6 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     const data = req.body
 
-
-    var response = {
-        status: null,
-        result: null,
-        message: null,
-    }
-
     //need validation
     const validRequest = await validation.merchantPaymentRequest(data)
 
