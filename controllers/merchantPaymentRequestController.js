@@ -145,7 +145,7 @@ exports.merchantPaymentRequest = async function (req, res) {
         return res.status(constant.invalidParameters.status).send(constant.invalidParameters)
     }
 
-    const invRows = await countInvoiceRows();
+    const invRows = await invoiceController.countInvoiceRows();
 
     const date = new Date();
 
