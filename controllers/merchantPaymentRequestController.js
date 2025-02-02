@@ -169,7 +169,7 @@ exports.merchantPaymentRequest = async function (req, res) {
                 transaction.rows[0].id,
                 data.amount,
                 currency[0].id,
-                statusId[0].id,
+                status[0].id,
                 created_at,
                 updated_at,
                 validMerchant[0].id,
