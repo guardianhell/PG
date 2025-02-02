@@ -305,7 +305,7 @@ Content-Type: application/json
     "payment_fee_chrg_to_customer" : "0",
     "min_amount": "10000",
     "max_amount": "9999999",
-,    "timelimit_payment": "600",
+,   "timelimit_payment": "600",
     "status_name":"active"
  }
  ###
