@@ -13,6 +13,9 @@ const constant = require('./constants')
 
 exports.merchantPaymentRequest = async function (req, res) {
 
+    console.log("TEST");
+
+
     const data = req.body
 
     //need validation
