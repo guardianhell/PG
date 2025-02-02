@@ -224,8 +224,8 @@ exports.createNewPaymentTypeValidation = function (data) {
     account_number: Joi.number().min(6).max(10000000000000).required(),
     payment_fee_chrg_to_system: Joi.number().min(0).max(100).required(),
     payment_fee_chrg_to_customer: Joi.number().min(0).max(100).required(),
-    min_amount: Joi.number().min(100).max(99999999).required(),
-    max_amount: Joi.number().min(100).max(99999999).required(),
+    min_amount: Joi.number().min(100).max(999999999).required(),
+    max_amount: Joi.number().min(100).max(999999999).required(),
     timelimit_payment: Joi.number().min(60).max(604800).required(),
     status_name: Joi.string().min(1).max(128).required(),
   });

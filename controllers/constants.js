@@ -39,3 +39,11 @@ module.exports.invalidSignature = Object.freeze(
         message: "Invalid Signature"
     }
 )
+
+module.exports.merchantInactive = Object.freeze(
+    {
+        status: 417,
+        result: 2301,
+        message: "Merchant Inactive"
+    }
+)
