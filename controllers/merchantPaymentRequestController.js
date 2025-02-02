@@ -218,7 +218,7 @@ exports.merchantPaymentRequest = async function (req, res) {
         payment_method_id: paymentMethod[0].id,
         payment_number: pgRespond.TransId,
         payment_link: pgRespond.Data.QRCode,
-        payment_vendor: paymentRequest.inquiry_id,
+        payment_vendor: "paymentRequest.inquiry_id",
         expire_date: pgRespond.Data.ExpireDate,
     }
 
