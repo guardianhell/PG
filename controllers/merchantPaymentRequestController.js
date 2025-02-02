@@ -61,7 +61,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     //checkpayment
 
 
-    const paymentMethod = paymentTypeController.getPaymentTypeById(data.paymentId)
+    const paymentMethod = await paymentTypeController.getPaymentTypeById(data.paymentId)
 
     if (paymentMethod.length == 0) {
         console.log("Invalid Payment Method, payment method not found");
