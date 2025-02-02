@@ -325,6 +325,20 @@ Content-Type: application/json
     "timelimit_payment": "600",
     "status_name":"active"
  }
+###
+
+
+POST http://localhost:8081/api-v1/merchants/payment-inquiry/qris
+ Content-Type: application/json
+
+ {
+    "merchantCode": "MRT-00001",
+    "paymentId":4,
+    "amount":100000,
+    "merchantTrxCode": "TEST-01",
+    "currency":"IDR",
+    "callbackURL" : "CALL BACK DONK"
+ }
  ###
 
 

@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const { getMerchantByNumber } = require("./merchantController")
 const paymentRequestController = require('./paymentRequestController')
 const paymentTypeController = require('./paymentTypeController')
+const statusController = require('./statusController')
 const { getInvoiceByMerchantTrxCode } = require("./invoiceController")
 const constant = require('./constants')
 
@@ -40,7 +41,7 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     //validateRequestSignature
 
-    const checkSignature = requestSignature(data)
+    const checkSignature = requestSignature(data, merchantKey)
 
     if (!data.signature == checkSignature) {
         return res.status(constant.invalidSignature.status).send(constant.invalidSignature)
@@ -60,7 +61,7 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     const paymentMethod = paymentTypeController.getPaymentTypeById(data.paymentId)
 
-    if (paymentMethodId.length == 0) {
+    if (paymentMethod.length == 0) {
         console.log("Invalid Payment Method, payment method not found");
         return res.status(constant.serverError.status).send(constant.serverError);
     }
@@ -91,7 +92,11 @@ exports.merchantPaymentRequest = async function (req, res) {
             updated_at,
             data.callbackURL
         ],
+    }).catch(async (error) => {
+        console.log(error);
+        return { error: "ERROR" }
     })
+
 
     if (transaction.error) {
         await client.query('ROLLBACK')
@@ -163,6 +168,9 @@ exports.merchantPaymentRequest = async function (req, res) {
                 validMerchant[0].id,
                 data.merchantTrxCode
             ],
+        }).catch(async (error) => {
+            console.log(error);
+            return { error: "ERROR" }
         })
 
 
@@ -231,6 +239,9 @@ exports.merchantPaymentRequest = async function (req, res) {
             created_at,
             updated_at,
         ],
+    }).catch(async (error) => {
+        console.log(error);
+        return { error: "ERROR" }
     })
 
     if (responsePaymentRequest.error) {
@@ -292,12 +303,12 @@ async function responseSignature(data, secretkey) {
 }
 
 
-async function requestSignature() {
+async function requestSignature(data, secret_key) {
 
     //merchantCode+merchantKey+paymentId+currency+amount+merchantTrxCode
 
     const merchantCode = data.merchantCode
-    const merchantKey = data.merchantKey
+    const merchantKey = secret_key
     const paymentId = data.paymentId
     const amount = data.amount
     const merchantTrxCode = data.amount
