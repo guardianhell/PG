@@ -226,7 +226,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     }
 
 
-    const validPayment = await validation.requestNewPaymentValidation(data)
+    const validPayment = await validation.requestNewPaymentValidation(dataPayment)
 
     if (validPayment.error) {
         await client.query('ROLLBACK')
