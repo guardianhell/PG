@@ -124,7 +124,7 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     const exist = await getInvoiceByMerchantTrxCode(data.merchantTrxCode, validMerchant[0].id)
 
-    if (exist != 0) {
+    if (exist.length != 0) {
         await client.query('ROLLBACK')
         await client.release()
         return res.status(constant.duplicateTrxCode.status).send(constant.duplicateTrxCode)
