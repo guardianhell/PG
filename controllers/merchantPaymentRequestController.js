@@ -68,6 +68,9 @@ exports.merchantPaymentRequest = async function (req, res) {
         return res.status(constant.serverError.status).send(constant.serverError);
     }
 
+    console.log(paymentMethod);
+
+
     //create timestamp
 
     let created_at = moment().valueOf();
