@@ -10,7 +10,6 @@ const crypto = require("crypto");
 
 exports.registerNewMerchant = async function (req, res) {
   try {
-    console.log("H");
     const valid = await validation.registerNewMerchantValidation(req.body);
 
     if (valid.error) {
@@ -42,7 +41,7 @@ exports.registerNewMerchant = async function (req, res) {
     exist = await getMerchantByNumber(merchantNumber);
 
     if (exist.length != 0) {
-      return res.status(417).send("Mechant Number has been used");
+      return res.status(417).send("Merchant Number has been used");
     }
 
     let secret_key = crypto.randomBytes(64).toString("hex");
@@ -155,3 +154,6 @@ async function getMerchantById(id) {
   });
   return result.rows;
 }
+
+
+module.exports.getMerchantByNumber = getMerchantByNumber

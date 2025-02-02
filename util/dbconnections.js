@@ -34,7 +34,7 @@ const getPassword = async () => await signer.getAuthToken(signerOptions)
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
-  database: "pandoorbox",
+  database: "pandoorboxnew",
   password: "!V1nzt3r91",
   port: 5432,
 });

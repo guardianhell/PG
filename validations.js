@@ -213,6 +213,7 @@ exports.createNewInvoiceValidation = function (data) {
   return schema.validate(data);
 };
 
+
 // Payment Type
 
 exports.createNewPaymentTypeValidation = function (data) {
@@ -241,6 +242,21 @@ exports.requestNewPaymentValidation = function(data){
     payment_link: Joi.string().min(1).max(1024).required(),
     payment_vendor: Joi.string().min(1).max(256).required(),
     expire_date: Joi.date().timestamp(),
+  })
+  return schema.validate(data)
+}
+
+//merchant Payment Request
+
+exports.merchantPaymentRequest = function (data) {
+  const schema = Joi.object({
+
+    merchantCode: Joi.string().min(1).max(256).required(),
+    paymentId: Joi.number().min(1).max(256).required(),
+    amount: Joi.number().min(1).max(9999999999).required(),
+    merchantTrxCode: Joi.string().min(3).max(512).required(),
+    currency: Joi.string().min(1).max(128).required(),
+    callbackURL: Joi.string().min(1).max(256).required()
   })
   return schema.validate(data)
 }

@@ -353,6 +353,10 @@ exports.checkPaymentStatus = async function (req, res) {
 
     console.log(response);
 
+    if (response.data.Status == "SUCCESS") {
+      //settlement
+    }
+
     return res.status(200).send(response.data)
 
 
@@ -726,5 +730,6 @@ async function paymentSettlement(paymentId, refValidationNumber) {
 module.exports.createNewPaymentRequest = createNewPaymentRequest
 module.exports.validateSignature = validateSignature
 module.exports.generateQRISE2Pay = generateQRISE2Pay
+module.exports.generatePaymentNumber = generatePaymentNumber
 
 

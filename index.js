@@ -19,6 +19,7 @@ const invoiceRoute = require("./routes/invoiceRoute");
 const paymentTypeRoute = require("./routes/paymentTypeRoute");
 const paymentRequestRoute = require("./routes/paymentRequestRoute");
 const callbackRoute = require("./routes/callbackRoute")
+const merchantPaymentRequestRoute = require("./routes/paymentRequestRoute")
 
 const corsConfig = {
   credentials: true,
@@ -56,6 +57,7 @@ app.use(urlAPI + "/invoice", invoiceRoute);
 app.use(urlAPI + "/payment-type", paymentTypeRoute);
 app.use(urlAPI + "/payment", paymentRequestRoute);
 app.use(urlAPI + "/e2p/trx", callbackRoute)
+app.use(urlAPI + "/merchant/payment-inquiry/", merchantPaymentRequestRoute)
 
 app.listen(port, function () {
   console.log("Server started on port " + port);

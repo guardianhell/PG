@@ -239,7 +239,7 @@ exports.createNewTransaction2 = async function (req, res) {
       return res.status(417).send(valid.error);
     }
 
-    statusId = await statusController.getStatusByName("Waiting for Payment");
+    const statusId = await statusController.getStatusByName("Waiting for Payment");
 
     console.log("STATUS FETCH : " + JSON.stringify(statusId));
 
@@ -413,6 +413,8 @@ exports.createNewTransaction2 = async function (req, res) {
           //SAVING Payment Request to DB
 
           console.log("WRITING TO DB");
+
+
 
 
           const paymentRequestResult = await paymentRequestController.createNewPaymentRequest(dataPayment, client).then(async (resultPaymentRequest) => {

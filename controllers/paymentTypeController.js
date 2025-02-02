@@ -32,7 +32,7 @@ exports.createNewPaymentType = async function (req, res) {
 
     await db.pool.query(
       {
-        text: "INSERT INTO payment_type(payment,bank, account_name,account_number, payment_fee_chrg_to_system,payment_fee_chrg_to_customer,timelimit_payment,status,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
+        text: "INSERT INTO payment_type(payment,bank, account_name,account_number, payment_fee_chrg_to_system,payment_fee_chrg_to_customer,timelimit_payment,status,min_amount,max_amount,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *",
         values: [
           req.body.payment,
           req.body.bank,
@@ -41,6 +41,8 @@ exports.createNewPaymentType = async function (req, res) {
           req.body.payment_fee_chrg_to_system,
           req.body.payment_fee_chrg_to_customer,
           req.body.timelimit_payment,
+          req.body.min_amount,
+          req.body.max_amount,
           status[0].id,
           created_at,
           updated_at,
@@ -73,4 +75,14 @@ async function getPaymentTypeByName(name) {
   return result.rows;
 }
 
+
+async function getPaymentTypeById(id) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM payment_type where id = $1",
+    values: [id],
+  });
+  return result.rows;
+}
+
 module.exports.getAllPaymentType = getAllPaymentType;
+module.exports.getPaymentTypeById = getPaymentTypeById

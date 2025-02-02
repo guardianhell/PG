@@ -236,6 +236,13 @@ async function getInvoiceById(id) {
   return result.rows
 }
 
+async function getInvoiceByMerchantTrxCode(merchantTrxCode, merchantId) {
+  const result = await db.pool.query({
+    text: "SELECT * FROM invoices where merchant_trx_code = $1 AND merchant_id = $2",
+    values: [merchantTrxCode, merchantId]
+  })
+}
+
 async function updateInvoiceStatusById(id, statusId) {
   const result = await db.pool.query({
     text: "UPDATE invoices SET status = $1 WHERE id = $2 RETURNING *",
@@ -247,3 +254,4 @@ module.exports.updateInvoiceStatusById = updateInvoiceStatusById
 module.exports.getInvoiceById = getInvoiceById;
 module.exports.getInvoiceByTrxId = getInvoiceByTrxId;
 module.exports.createNewInvoiceFunction = createNewInvoiceFunction
+module.exports.getInvoiceByMerchantTrxCode = getInvoiceByMerchantTrxCode
