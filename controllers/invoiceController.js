@@ -241,6 +241,7 @@ async function getInvoiceByMerchantTrxCode(merchantTrxCode, merchantId) {
     text: "SELECT * FROM invoices where merchant_trx_code = $1 AND merchant_id = $2",
     values: [merchantTrxCode, merchantId]
   })
+  return result.rows
 }
 
 async function updateInvoiceStatusById(id, statusId) {
