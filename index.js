@@ -57,7 +57,7 @@ app.use(urlAPI + "/invoice", invoiceRoute);
 app.use(urlAPI + "/payment-type", paymentTypeRoute);
 app.use(urlAPI + "/payment", paymentRequestRoute);
 app.use(urlAPI + "/e2p/trx", callbackRoute)
-app.use(urlAPI + "/merchant/payment-inquiry", merchantPaymentRequestRoute)
+app.use(urlAPI + "/merchant/paymentinquiry", merchantPaymentRequestRoute)
 
 app.listen(port, function () {
   console.log("Server started on port " + port);
