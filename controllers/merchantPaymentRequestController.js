@@ -191,6 +191,9 @@ exports.merchantPaymentRequest = async function (req, res) {
         return res.status(constant.serverError.status).send(constant.serverError)
     }
 
+    console.log(invoice);
+
+
     const manipulationTotalAmount = data.amount + "00"
 
     const pgdata = {
