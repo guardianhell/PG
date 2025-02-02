@@ -303,7 +303,9 @@ Content-Type: application/json
     "account_number" : "123441241",
     "payment_fee_chrg_to_system" : "0.4",
     "payment_fee_chrg_to_customer" : "0",
-    "timelimit_payment": "600",
+    "min_amount": "10000",
+    "max_amount": "9999999"
+,    "timelimit_payment": "600",
     "status_name":"active"
  }
  ###

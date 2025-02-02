@@ -100,7 +100,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     const invoiceData = {
         trx_id: transaction.rows[0].id,
         amount: transaction.rows[0].total_amount,
-        currency_name: 'Rupiah',
+        currency_name: 'IDR',
     }
 
 
@@ -151,7 +151,7 @@ exports.merchantPaymentRequest = async function (req, res) {
             text: "INSERT INTO invoices(invoice_number, trx_id,amount,currency_id,status,created_at,updated_at,merchant_id,merchant_trx_code) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
             values: [
                 invoiceNumber,
-                transaction.trx_id,
+                transaction[0].trx_id,
                 data.amount,
                 currency[0].id,
                 statusId[0].id,
@@ -192,8 +192,8 @@ exports.merchantPaymentRequest = async function (req, res) {
 
 
     const dataPayment = {
-        invoice_id: invoice.id,
-        amount: invoice.amount,
+        invoice_id: invoice[0].id,
+        amount: invoice[0].amount,
         payment_method_id: paymentMethod[0].id,
         payment_number: pgRespond.TransId,
         payment_link: pgRespond.Data.QRCode,
