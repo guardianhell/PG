@@ -7,6 +7,7 @@ const paymentRequestController = require('./paymentRequestController')
 const paymentTypeController = require('./paymentTypeController')
 const statusController = require('./statusController')
 const currencyController = require('./currencyController')
+const invoiceController = require('./invoiceController')
 const { getInvoiceByMerchantTrxCode } = require("./invoiceController")
 const constant = require('./constants')
 

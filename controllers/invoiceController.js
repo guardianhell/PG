@@ -256,3 +256,4 @@ module.exports.getInvoiceById = getInvoiceById;
 module.exports.getInvoiceByTrxId = getInvoiceByTrxId;
 module.exports.createNewInvoiceFunction = createNewInvoiceFunction
 module.exports.getInvoiceByMerchantTrxCode = getInvoiceByMerchantTrxCode
+module.exports.countInvoiceRows = countInvoiceRows
