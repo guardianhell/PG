@@ -75,7 +75,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     //generate trx number
     let trx_number = data.merchantTrxCode
 
-    const userId = crypto.randomInt(1, 20)
+    const userId = crypto.randomInt(1, 10)
 
     const client = await db.pool.connect()
 
