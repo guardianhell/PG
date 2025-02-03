@@ -335,7 +335,7 @@ POST http://localhost:8081/api-v1/merchants/payment-inquiry/rqst
     "merchantCode": "MRT-00001",
     "paymentId":4,
     "amount":100000,
-    "merchantTrxCode": "TEST-01",
+    "merchantTrxCode": "TEST-010",
     "currency":"IDR",
     "callbackURL" : "CALL BACK DONK"
  }

@@ -218,6 +218,11 @@ exports.merchantPaymentRequest = async function (req, res) {
         await client.release()
         console.log("failed pg query!");
         console.log(pgRespond);
+
+        if (pgRespond.Code == 'pge2104') {
+            return res.status(constant.duplicateTrxCode.status).send(constant.duplicateTrxCode)
+        }
+
         return res.status(constant.serverError.status).send(constant.serverError)
     }
 
