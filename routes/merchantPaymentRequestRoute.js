@@ -5,4 +5,6 @@ const merchantPaymentRequestController = require("../controllers/merchantPayment
 
 router.post("/rqst", merchantPaymentRequestController.merchantPaymentRequest)
 
+router.post("/validate", merchantPaymentRequestController.validateSignatureResponse)
+
 module.exports = router

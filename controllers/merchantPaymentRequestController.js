@@ -17,6 +17,10 @@ const constant = require('./constants')
 
 exports.merchantPaymentRequest = async function (req, res) {
 
+    try {
+
+
+
 
     const data = req.body
 
@@ -311,7 +315,43 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     // generateResponseSignature
 
+    } catch (error) {
+        console.log(error);
+        return res.status(constant.serverError.status).send(constant.serverError)
+    }
+
 }
+
+
+exports.merchantPaymentQuery = async function (req, res) {
+
+    try {
+
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(constant.serverError.status).send(constant.serverError)
+    }
+
+}
+
+exports.validateSignatureResponse = async function (req, res) {
+
+    try {
+        const signature = await crypto.createHash("sha256").update("MRT-0000155cdb5ce5d63a654e2015c4839ef0df4db0e695cfee8f230be5be0aae1b433db72b884e6af104ceb8437db36b510dd57ab102f8697fb0b9122ec81fd8ccbe8d74IDR10000TEST-017Waiting for Payment").digest("base64")
+
+        console.log(signature);
+
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(constant.serverError.status).send(constant.serverError)
+    }
+
+}
+
 
 
 async function responseSignature(data, secretkey) {
