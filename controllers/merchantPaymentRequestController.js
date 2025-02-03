@@ -16,8 +16,6 @@ const constant = require('./constants')
 
 exports.merchantPaymentRequest = async function (req, res) {
 
-    console.log("TEST");
-
 
     const data = req.body
 
@@ -35,6 +33,13 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     if (!validMerchant) {
         return res.status(constant.invalidMerchant.status).send(constant.invalidMerchant)
+    }
+
+    const merchantStatus = await statusController.getStatusById(validMerchant[0].status)
+
+
+    if (merchantStatus[0].status_name != "Active") {
+        return res.status(constant.merchantInactive.status).send(constant.merchantInactive)
     }
 
     const merchantKey = validMerchant[0].secret_key
@@ -68,7 +73,13 @@ exports.merchantPaymentRequest = async function (req, res) {
         return res.status(constant.serverError.status).send(constant.serverError);
     }
 
-    console.log(paymentMethod);
+
+    const minAmountPaymentMethod = paymentMethod[0].min_amount
+
+    if (data.amount < minAmountPaymentMethod) {
+        console.log("Amount doesn't meet minimimum amount payment method");
+        return res.status(constant.invalidParameters.status).send(constant.invalidParameters)
+    }
 
 
     //create timestamp
@@ -109,7 +120,6 @@ exports.merchantPaymentRequest = async function (req, res) {
         console.log(transaction.error);
         return res.status(constant.serverError.status).send(constant.serverError)
     }
-    console.log(transaction);
 
 
     const invoiceData = {
@@ -130,8 +140,6 @@ exports.merchantPaymentRequest = async function (req, res) {
 
 
     const exist = await getInvoiceByMerchantTrxCode(data.merchantTrxCode, validMerchant[0].id)
-
-    console.log(exist);
 
 
     if (exist.length != 0) {
@@ -191,7 +199,6 @@ exports.merchantPaymentRequest = async function (req, res) {
         return res.status(constant.serverError.status).send(constant.serverError)
     }
 
-    console.log(invoice);
 
 
     const manipulationTotalAmount = data.amount + "00"

@@ -3,6 +3,6 @@ const merchantPaymentRequestController = require("../controllers/merchantPayment
 
 
 
-router.post("/qris", merchantPaymentRequestController.merchantPaymentRequest)
+router.post("/rqst", merchantPaymentRequestController.merchantPaymentRequest)
 
 module.exports = router

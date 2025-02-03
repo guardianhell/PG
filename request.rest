@@ -328,7 +328,7 @@ Content-Type: application/json
 ###
 
 
-POST http://localhost:8081/api-v1/merchants/payment-inquiry/qris
+POST http://localhost:8081/api-v1/merchants/payment-inquiry/rqst
  Content-Type: application/json
 
  {
