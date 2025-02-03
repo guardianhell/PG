@@ -8,6 +8,7 @@ const paymentTypeController = require('./paymentTypeController')
 const statusController = require('./statusController')
 const currencyController = require('./currencyController')
 const invoiceController = require('./invoiceController')
+const transactionController = require('./transactionController')
 const { getInvoiceByMerchantTrxCode } = require("./invoiceController")
 const constant = require('./constants')
 
@@ -89,7 +90,11 @@ exports.merchantPaymentRequest = async function (req, res) {
 
 
     //generate trx number
-    let trx_number = data.merchantTrxCode
+
+    const trxRows = await transactionController.countTranscationRows();
+
+    let trx_number =
+        "TX-" + moment().valueOf() + "-" + parseInt(trxRows[0].count + 1);
 
     const userId = crypto.randomInt(1, 10)
 

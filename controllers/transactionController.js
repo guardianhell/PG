@@ -579,3 +579,4 @@ async function getTransactionDetailByTransactionId(id) {
 
 module.exports.getTransactionById = getTransactionById;
 module.exports.getTransactionAndTransactionDetailById = getTransactionAndTransactionDetailById
+module.exports.countTranscationRows = countTranscationRows
