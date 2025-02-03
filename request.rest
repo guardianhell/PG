@@ -339,7 +339,15 @@ POST http://localhost:8081/api-v1/merchants/payment-inquiry/rqst
     "currency":"IDR",
     "callbackURL" : "CALL BACK DONK"
  }
- ###
+###
+
+
+ POST http://localhost:8081/api-v1/merchants/payment-inquiry/validate
+ Content-Type: application/json
+
+ {
+
+ }
 
 
  
