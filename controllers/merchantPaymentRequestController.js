@@ -349,12 +349,12 @@ exports.validateSignatureResponse = async function (req, res) {
 
         const data = {
             merchantCode: "MRT-00001",
-            secretKey: "55cdb5ce5d63a654e2015c4839ef0df4db0e695cfee8f230be5be0aae1b433db72b884e6af104ceb8437db36b510dd57ab102f8697fb0b9122ec81fd8ccbe8d7",
             paymentId: "4",
             currency: "IDR",
             amount: "10000",
-            merchantTrxCode: "TEST-018",
-            statusName: "Waiting for Payment"
+            merchantTrxCode: "TEST-019",
+            statusName: "Waiting for Payment",
+            trx: "332"
         }
 
 
@@ -363,7 +363,7 @@ exports.validateSignatureResponse = async function (req, res) {
         const paymentId = "4"
         const currency = "IDR"
         const amount = "10000"
-        const merchantTrxCode = "TEST-018"
+        const merchantTrxCode = "TEST-030"
         const statusName = "Waiting for Payment"
 
         const signature = await crypto.createHash("sha256").update(merchantCode + secretKey + paymentId + currency + amount + merchantTrxCode + statusName).digest("base64")
@@ -372,14 +372,15 @@ exports.validateSignatureResponse = async function (req, res) {
 
         const signature2 = await responseSignature(data, secretKey)
 
+        console.log("SIGN2");
+
         console.log(signature2);
 
-        const test1 = await crypto.createHash("sha256").update("123-123").digest("base64")
+        const signature3 = await responseSignature(data, secretKey)
 
-        const test2 = await crypto.createHash("sha256").update("123-123").digest("base64")
+        console.log("SIGN3");
 
-        console.log(test1);
-        console.log(test2);
+        console.log(signature3);
 
 
 
