@@ -45,7 +45,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     const merchantStatus = await statusController.getStatusById(validMerchant[0].status)
 
 
-        if (merchantStatus[0].status_name != "active") {
+        if (merchantStatus[0].status_name != "Active") {
         return res.status(constant.merchantInactive.status).send(constant.merchantInactive)
     }
 
