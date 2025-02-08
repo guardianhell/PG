@@ -36,6 +36,8 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     const validMerchant = await getMerchantByNumber(merchantCode)
 
+        console.log(validMerchant);
+
     if (!validMerchant) {
         return res.status(constant.invalidMerchant.status).send(constant.invalidMerchant)
     }
@@ -43,7 +45,7 @@ exports.merchantPaymentRequest = async function (req, res) {
     const merchantStatus = await statusController.getStatusById(validMerchant[0].status)
 
 
-    if (merchantStatus[0].status_name != "Active") {
+        if (merchantStatus[0].status_name != "active") {
         return res.status(constant.merchantInactive.status).send(constant.merchantInactive)
     }
 
@@ -226,7 +228,13 @@ exports.merchantPaymentRequest = async function (req, res) {
         PaymentId: paymentMethod[0].account_number
     }
 
-    const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
+        // const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
+
+        const pgRespond = await paymentRequestController.generateURLDana(pgdata)
+
+
+
+
 
     if (pgRespond.Code != "00") {
         await client.query('ROLLBACK')

@@ -18,6 +18,7 @@ const crypto = require("crypto");
 var jsonminify = require("jsonminify");
 const { base64encode, base64decode } = require("nodejs-base64");
 const { time, log } = require("console");
+const { sign } = require("jsonwebtoken");
 
 exports.requestNewPayment = async function (req, res) {
   try {
@@ -585,6 +586,44 @@ async function settlementToVendorUPL(paymentId) {
 
 }
 
+
+async function generateURLDana(dataBody) {
+  const url = process.env.URLFIUU
+  const vendorKey = process.env.FIUUVENDORKEY
+  const vendorCode = process.env.FIUUVENDORCODE
+  const amount = dataBody.TxnAmount
+  const trxCode = dataBody.ReferenceNo
+
+
+  const signatureString = amount + vendorCode + trxCode + vendorKey
+
+  const signature = await crypto.createHash('md5').update(signatureString).digest('hex')
+
+  const data = {
+    "MerchantID": vendorCode,
+    "ReferenceNo": trxCode,
+    "TxnType": "SALS",
+    "TxnChannel": 32,
+    "TxnCurrency": "IDR",
+    "TxnAmount": amount,
+    "Signature": signature
+  }
+
+  const response = await axios.post(url, data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then((res) => {
+    console.log(res);
+    return res
+  }).catch((error) => {
+    console.log(error);
+    return error
+  })
+
+
+}
+
 async function generateQRISE2Pay(dataBody) {
   const url = process.env.URLE2PAY;
   const merchantKey = process.env.MERCHANTKEY;
@@ -731,5 +770,6 @@ module.exports.createNewPaymentRequest = createNewPaymentRequest
 module.exports.validateSignature = validateSignature
 module.exports.generateQRISE2Pay = generateQRISE2Pay
 module.exports.generatePaymentNumber = generatePaymentNumber
+module.exports.generateURLDana = generateURLDana
 
 

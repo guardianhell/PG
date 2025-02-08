@@ -50,7 +50,7 @@ POST http://localhost:8081/api-v1/status/add
 Content-Type: application/json
 
 {
-    "status_name" : "Active"
+    "status_name" : "active"
 }
 
 ###
@@ -118,7 +118,7 @@ POST http://localhost:8081/api-v1/currency/add
 Content-Type: application/json
 
 {
-    "currency_name" : "Rupiah",
+    "currency_name" : "IDR",
     "currency_symbol" : "Rp",
     "country" : "Indonesia"
 }
@@ -333,9 +333,9 @@ POST http://localhost:8081/api-v1/merchants/payment-inquiry/rqst
 
  {
     "merchantCode": "MRT-00001",
-    "paymentId":4,
+    "paymentId":1,
     "amount":100000,
-    "merchantTrxCode": "TEST-010",
+    "merchantTrxCode": "TEST-011",
     "currency":"IDR",
     "callbackURL" : "CALL BACK DONK"
  }
