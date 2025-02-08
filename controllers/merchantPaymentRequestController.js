@@ -230,7 +230,7 @@ exports.merchantPaymentRequest = async function (req, res) {
 
         // const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
-        const pgRespond = await paymentRequestController.generateURLDana(pgdata)
+        const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
 
 

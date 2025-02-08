@@ -659,7 +659,7 @@ async function generateQRISE2Pay(dataBody) {
 
   const data = {
     "MerchantCode": merchantCode,
-    "PaymentId": 21,
+    "PaymentId": 32,
     "RefNo": dataBody.ReferenceNo,
     "Amount": dataBody.TxnAmount,
     "Currency": "IDR",
