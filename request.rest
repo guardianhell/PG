@@ -295,7 +295,7 @@ Content-Type: application/json
     "currency":"IDR",
     "callbackURL":"CALLBANK URLS"
  }
- ###
+###
 
  ###
 

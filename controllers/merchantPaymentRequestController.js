@@ -51,7 +51,6 @@ exports.merchantPaymentRequest = async function (req, res) {
 
     const merchantKey = validMerchant[0].secret_key
 
-    data.merchantKey = merchantKey
 
     //validateRequestSignature
 
@@ -230,8 +229,7 @@ exports.merchantPaymentRequest = async function (req, res) {
 
         // const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
-        const pgRespond = await paymentRequestController.generateURLDana(pgdata)
-
+        const pgRespond = await paymentRequestController.generateQRISE2Pay(pgdata)
 
 
 
